@@ -245,7 +245,7 @@ def cmd_compile(args):
     master = path / "master.tex"
     if not master.exists():
         raise SystemExit(f"Missing {master}")
-    subprocess.run(["latexmk", "-f", "-interaction=nonstopmode", str(master)], cwd=path, check=False)
+    subprocess.run(["latexmk", "-pdf", "-f", "-interaction=nonstopmode", str(master)], cwd=path, check=False)
 
 
 def cmd_list_figures(_args):
