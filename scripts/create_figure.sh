@@ -8,12 +8,20 @@ fi
 
 FIG_NAME="$1"
 FIG_DIR="${2:-figures}"
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 SVG_PATH="$FIG_DIR/$FIG_NAME.svg"
 PDF_PATH="$FIG_DIR/$FIG_NAME.pdf"
+TEMPLATE_PATH="$FIG_DIR/template.svg"
+
+mkdir -p "$FIG_DIR"
+
+if [ ! -f "$TEMPLATE_PATH" ]; then
+  cp "$ROOT_DIR/templates/template.svg" "$TEMPLATE_PATH"
+fi
 
 if [ ! -f "$SVG_PATH" ]; then
-  cp "$FIG_DIR/template.svg" "$SVG_PATH"
+  cp "$TEMPLATE_PATH" "$SVG_PATH"
 fi
 
 if command -v open >/dev/null 2>&1; then
@@ -22,7 +30,7 @@ else
   inkscape "$SVG_PATH" &
 fi
 
-fswatch -o "$SVG_PATH" | while read f; do
+fswatch -o "$SVG_PATH" | while read -r _; do
   inkscape "$SVG_PATH" \
     --export-type=pdf \
     --export-latex \

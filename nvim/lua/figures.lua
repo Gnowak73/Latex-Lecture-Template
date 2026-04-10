@@ -17,6 +17,10 @@ local function vimtex_root_or_cwd()
   if vim.b.vimtex and vim.b.vimtex.root then
     return vim.b.vimtex.root
   end
+  local buf_path = vim.api.nvim_buf_get_name(0)
+  if buf_path ~= "" then
+    return vim.fn.fnamemodify(buf_path, ":p:h")
+  end
   return vim.fn.getcwd()
 end
 
