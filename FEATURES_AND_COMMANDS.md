@@ -35,6 +35,11 @@ Lecture management:
 - `notes compile --current`
 - `notes compile --course <name>`
 
+Template defaults:
+
+- new notebooks use `\documentclass[a4paper]{report}`
+- default preamble is `templates/preamble.tex` (lecture macros + headers + figure include command)
+
 Figure management:
 
 - `notes list-figures`
@@ -67,3 +72,4 @@ Figure picker dependency:
 Snippet dependencies:
 
 - install `lervag/vimtex` and `SirVer/ultisnips`
+- verify in Neovim with `:echo exists(':UltiSnipsEdit')` (expect `2`)

@@ -8,6 +8,7 @@ Main goal: keep note-taking fast in Neovim, make figure drawing easy in Inkscape
 - organizes notes as `courses/` and `topics/`
 - creates lecture files like `lec_01.tex`, `lec_02.tex`, etc.
 - keeps a `master.tex` per notebook to compile everything together
+- uses a Gilles-Castel-style lecture layout (`report` class + lecture headers/macros in `templates/preamble.tex`)
 - supports Inkscape figures with quick create/edit flow
 - includes Neovim keymaps for daily use
 
@@ -112,10 +113,15 @@ You still need to install the plugins in your Neovim setup:
 Quick check inside Neovim:
 
 ```vim
-:echo exists('*UltiSnips#ExpandSnippet')
+:echo exists(':UltiSnipsEdit')
 ```
 
-`1` means snippet expansion is active.
+`2` means UltiSnips is loaded.
+
+TeX `<Tab>` behavior:
+
+- if UltiSnips is loaded: expand/jump snippet
+- otherwise: insert a literal tab (no LSP snippet parsing)
 
 ## Commands reference
 

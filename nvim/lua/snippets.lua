@@ -33,11 +33,15 @@ vim.g.UltiSnipsSnippetDirectories = { "UltiSnips" }
 
 add_current_notebook_to_rtp()
 
+local function has_ultisnips()
+  return vim.fn.exists(":UltiSnipsEdit") == 2
+end
+
 vim.keymap.set({ "i", "s" }, "<Tab>", function()
   if vim.bo.filetype ~= "tex" then
     return "\t"
   end
-  if vim.fn.exists("*UltiSnips#ExpandSnippetOrJump") == 1 then
+  if has_ultisnips() then
     return vim.fn["UltiSnips#ExpandSnippetOrJump"]()
   end
   return "\t"
@@ -47,7 +51,7 @@ vim.keymap.set("i", "<S-Tab>", function()
   if vim.bo.filetype ~= "tex" then
     return "<S-Tab>"
   end
-  if vim.fn.exists("*UltiSnips#JumpBackwards") == 1 then
+  if has_ultisnips() then
     return vim.fn["UltiSnips#JumpBackwards"]()
   end
   return "<S-Tab>"
