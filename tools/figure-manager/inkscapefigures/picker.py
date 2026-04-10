@@ -3,11 +3,11 @@ Call a command line fuzzy matcher to select a figure to edit.
 
 Current supported matchers are:
 
-* rofi for Linux platforms
-* choose (https://github.com/chipsenkbeil/choose) on MacOS
+* choose-gui (https://github.com/chipsenkbeil/choose)
 """
 import subprocess
 import platform
+import shutil
 
 SYSTEM_NAME = platform.system()
 
@@ -16,17 +16,17 @@ def get_picker_cmd(picker_args=None, fuzzy=True):
     """
     Create the shell command that will be run to start the picker.
     """
-
-    if SYSTEM_NAME == "Linux":
-        args = ['rofi', '-sort', '-no-levenshtein-sort']
-        if fuzzy:
-            args += ['-matching', 'fuzzy']
-        args += ['-dmenu', '-p', "Select Figure", '-format', 's', '-i',
-                 '-lines', '5']
-    elif SYSTEM_NAME == "Darwin":
-        args = ["choose"]
-    else:
+    if SYSTEM_NAME not in ("Darwin", "Linux"):
         raise ValueError("No supported picker for {}".format(SYSTEM_NAME))
+
+    choose_gui = shutil.which("choose-gui")
+    choose_bin = shutil.which("choose")
+    if choose_gui:
+        args = [choose_gui]
+    elif choose_bin:
+        args = [choose_bin]
+    else:
+        raise ValueError("picker not found; please install choose-gui")
 
     if picker_args is not None:
         args += picker_args

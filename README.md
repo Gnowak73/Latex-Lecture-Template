@@ -32,6 +32,28 @@ export PATH="$PWD/bin:$PATH"
 
 That installs required tools and sets up the Neovim config from this repo.
 
+## Permanent PATH for `notes`
+
+Temporary (current shell only):
+
+```bash
+export PATH="/Users/gabe/Github/Latex-Lecture-Template/bin:$PATH"
+```
+
+Permanent on zsh:
+
+```bash
+echo 'export PATH="/Users/gabe/Github/Latex-Lecture-Template/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+Permanent on bash:
+
+```bash
+echo 'export PATH="/Users/gabe/Github/Latex-Lecture-Template/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
 ## Quick start
 
 Create a course and set it active:
@@ -54,7 +76,18 @@ notes compile --current
 In Neovim:
 
 - `Space+i` creates a new figure and opens Inkscape
-- `Space+I` lets you pick/edit an existing figure
+- `Space+I` opens a searchable picker and edits a selected figure in Inkscape
+
+Picker requirement:
+
+- install `choose-gui` (used by figure search on both macOS and Linux)
+- picker executable can be either `choose-gui` or `choose`
+
+Troubleshooting:
+
+- if `Space+I` shows `No figures directory`, open a file in a notebook with a `figures/` folder
+- if it shows `No .svg figures found`, create a figure first with `Space+i`
+- if it shows `Picker not found`, install `choose-gui`
 
 CLI options:
 

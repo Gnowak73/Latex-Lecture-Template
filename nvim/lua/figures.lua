@@ -20,6 +20,10 @@ local function vimtex_root_or_cwd()
   return vim.fn.getcwd()
 end
 
+pcall(vim.keymap.del, "n", "<leader>o")
+pcall(vim.keymap.del, "n", "<Space>o")
+pcall(vim.keymap.del, "n", "\\o")
+
 vim.keymap.set("n", "<leader>i", function()
   local title = vim.fn.input("Figure title: ")
   if title == "" then
@@ -53,7 +57,26 @@ end, { desc = "Create figure (script watcher mode)" })
 vim.keymap.set("n", "<leader>I", function()
   local root = vimtex_root_or_cwd()
   local figdir = root .. "/figures/"
-  local cmd = project_root() .. "/bin/inkfig edit " .. vim.fn.shellescape(figdir) .. " > /dev/null 2>&1 &"
-  vim.cmd("silent exec '!" .. cmd .. "'")
-  vim.cmd("redraw!")
+  local has_choose_gui = vim.fn.executable("choose-gui") == 1
+  local has_choose = vim.fn.executable("choose") == 1
+  if not has_choose_gui and not has_choose then
+    print("Picker not found. Please install choose-gui.")
+    return
+  end
+
+  if vim.fn.isdirectory(figdir) == 0 then
+    print("No figures directory: " .. figdir)
+    return
+  end
+
+  local svgs = vim.fn.globpath(figdir, "*.svg", false, true)
+  if #svgs == 0 then
+    print("No .svg figures found in: " .. figdir)
+    return
+  end
+
+  local job = vim.fn.jobstart({ project_root() .. "/bin/inkfig", "edit", figdir }, { detach = true })
+  if job <= 0 then
+    print("Failed to launch figure picker")
+  end
 end, { desc = "Pick and edit Inkscape figure" })

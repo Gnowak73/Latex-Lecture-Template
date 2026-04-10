@@ -54,8 +54,12 @@ Figure management:
 ## Neovim Keymaps
 
 - `Space+i`: create figure, open Inkscape, start per-figure watcher
-- `Space+I`: pick/edit figure for current notebook
+- `Space+I`: search/pick `.svg` figure in current notebook and open it in Inkscape
 - `Space+c+n`: init course
 - `Space+c+s`: set current notebook
 - `Space+l+n`: new lecture
 - `Space+l+o`: open latest lecture
+
+Figure picker dependency:
+
+- install `choose-gui`; executable can be `choose-gui` or `choose`

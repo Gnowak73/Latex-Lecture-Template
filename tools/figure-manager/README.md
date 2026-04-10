@@ -5,10 +5,10 @@ More information in this [blog post](https://castel.dev/post/lecture-notes-2/).
 
 ## Requirements
 
-You need Python >= 3.7, as well as a picker. Current supported pickers are:
+You need Python >= 3.7, as well as a picker. Current supported picker is:
 
-* [rofi](https://github.com/davatorium/rofi) on Linux systems
-* [choose](https://github.com/chipsenkbeil/choose) on MacOS
+* [choose-gui](https://github.com/chipsenkbeil/choose)
+  (binary may be `choose-gui` or `choose`, depending on install method)
 
 ## Installation
 
