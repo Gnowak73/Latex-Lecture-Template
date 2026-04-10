@@ -11,8 +11,9 @@ This file is command-only reference. Setup/workflow context is in `README.md`.
 
 Notebook creation:
 
-- `notes init-course <name> --title "<title>" --short <code> [--url <url>]`
-- `notes init-topic <name> --title "<title>" --short <code> [--url <url>]`
+- `notes init-course <name> --title "<title>" --short <code> [--url <url>] [--template <name>]`
+- `notes init-topic <name> --title "<title>" --short <code> [--url <url>] [--template <name>]`
+- `notes list-templates`
 
 Notebook listing/selection:
 
@@ -38,7 +39,17 @@ Lecture management:
 Template defaults:
 
 - new notebooks use `\documentclass[a4paper]{report}`
-- default preamble is `templates/preamble.tex` (lecture macros + headers + figure include command)
+- each notebook gets a local `preamble.tex` at creation time
+- available templates:
+  - `template1`
+  - `template2`
+  - `template3`
+  - `template4`
+- file mapping:
+  - `template1` -> `templates/preambles/template1.tex`
+  - `template2` -> `templates/preambles/template2.tex`
+  - `template3` -> `templates/preambles/template3.tex`
+  - `template4` -> `templates/preambles/template4.tex`
 
 Figure management:
 

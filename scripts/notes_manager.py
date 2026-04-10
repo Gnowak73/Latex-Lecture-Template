@@ -18,9 +18,17 @@ CURRENT_LINK = ROOT / ".current_course"
 DATE_FORMAT = "%a %d %b %Y %H:%M"
 SNIPPETS_TEMPLATE = ROOT / "templates" / "tex.snippets"
 FIGURE_TEMPLATE = ROOT / "templates" / "template.svg"
+PREAMBLES_DIR = ROOT / "templates" / "preambles"
+
+TEMPLATE_PREAMBLES = {
+    "template1": PREAMBLES_DIR / "template1.tex",
+    "template2": PREAMBLES_DIR / "template2.tex",
+    "template3": PREAMBLES_DIR / "template3.tex",
+    "template4": PREAMBLES_DIR / "template4.tex",
+}
 
 MASTER_TEMPLATE = """\\documentclass[a4paper]{{report}}
-\\input{{../../templates/preamble.tex}}
+\\input{{./preamble.tex}}
 \\title{{{title}}}
 \\author{{Gabriel Nowaskie}}
 \\begin{{document}}
@@ -118,10 +126,36 @@ def parse_range(spec: str, all_numbers: list[int]) -> list[int]:
 def current_course_path() -> Path:
     if CURRENT_LINK.exists() and CURRENT_LINK.is_symlink():
         return CURRENT_LINK.resolve()
-    raise SystemExit("No current course set. Use: notes set-current <course-name>")
+    raise SystemExit("No current notebook set. Use: notes set-current <name>")
 
 
-def init_notebook(path: Path, title: str, short: str, url: str):
+def selected_preamble_template(name: str) -> Path:
+    preamble = TEMPLATE_PREAMBLES.get(name)
+    if preamble is None:
+        available = ", ".join(sorted(TEMPLATE_PREAMBLES.keys()))
+        raise SystemExit(f"Unknown template '{name}'. Available: {available}")
+    if not preamble.exists():
+        raise SystemExit(f"Template file is missing: {preamble}")
+    return preamble
+
+
+def write_notebook_preamble(path: Path, template_name: str):
+    src = selected_preamble_template(template_name)
+    dst = path / "preamble.tex"
+    text = src.read_text(encoding="utf-8")
+
+    # Compatibility: lecture-notes templates define \lesson, while this tool writes \lecture.
+    compat = (
+        "\n\n% Compatibility for notes_manager.py lecture files.\n"
+        "\\providecommand{\\lecture}[3]{\\lesson{#1}{#2}{#3}}\n"
+    )
+
+    if "\\providecommand{\\lecture}" not in text:
+        text += compat
+    dst.write_text(text, encoding="utf-8")
+
+
+def init_notebook(path: Path, title: str, short: str, url: str, template: str):
     path.mkdir(parents=True, exist_ok=True)
     (path / "figures").mkdir(exist_ok=True)
     (path / "UltiSnips").mkdir(exist_ok=True)
@@ -137,6 +171,10 @@ def init_notebook(path: Path, title: str, short: str, url: str):
     if not master.exists():
         master.write_text(MASTER_TEMPLATE.format(title=title), encoding="utf-8")
 
+    preamble = path / "preamble.tex"
+    if not preamble.exists():
+        write_notebook_preamble(path, template)
+
     course_snippets = path / "UltiSnips" / "tex.snippets"
     if SNIPPETS_TEMPLATE.exists() and not course_snippets.exists():
         shutil.copy2(SNIPPETS_TEMPLATE, course_snippets)
@@ -148,7 +186,7 @@ def init_notebook(path: Path, title: str, short: str, url: str):
 
 def cmd_init_course(args):
     path = notebook_dir("course", args.name)
-    init_notebook(path, args.title, args.short, args.url)
+    init_notebook(path, args.title, args.short, args.url, args.template)
     print(f"Initialized course at {path}")
 
 
@@ -162,7 +200,7 @@ def cmd_list_courses(_args):
 
 def cmd_init_topic(args):
     path = notebook_dir("topic", args.name)
-    init_notebook(path, args.title, args.short, args.url)
+    init_notebook(path, args.title, args.short, args.url, args.template)
     print(f"Initialized topic at {path}")
 
 
@@ -396,6 +434,11 @@ def cmd_pick_view(_args):
     cmd_update_view(argparse.Namespace(spec=mapping[selected]))
 
 
+def cmd_list_templates(_args):
+    for name in sorted(TEMPLATE_PREAMBLES.keys()):
+        print(name)
+
+
 def build_parser():
     p = argparse.ArgumentParser(prog="notes", description="Unified notes manager")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -405,6 +448,12 @@ def build_parser():
     a.add_argument("--title", required=True)
     a.add_argument("--short", required=True)
     a.add_argument("--url", default="https://")
+    a.add_argument(
+        "--template",
+        default="template1",
+        choices=sorted(TEMPLATE_PREAMBLES.keys()),
+        help="Notebook template style",
+    )
     a.set_defaults(func=cmd_init_course)
 
     a = sub.add_parser("list-courses", help="List courses")
@@ -415,16 +464,22 @@ def build_parser():
     a.add_argument("--title", required=True)
     a.add_argument("--short", required=True)
     a.add_argument("--url", default="https://")
+    a.add_argument(
+        "--template",
+        default="template1",
+        choices=sorted(TEMPLATE_PREAMBLES.keys()),
+        help="Notebook template style",
+    )
     a.set_defaults(func=cmd_init_topic)
 
     a = sub.add_parser("list-topics", help="List topics")
     a.set_defaults(func=cmd_list_topics)
 
-    a = sub.add_parser("set-current", help="Set active course")
+    a = sub.add_parser("set-current", help="Set active notebook (course or topic)")
     a.add_argument("name")
     a.set_defaults(func=cmd_set_current)
 
-    a = sub.add_parser("show-current", help="Show active course")
+    a = sub.add_parser("show-current", help="Show active notebook")
     a.set_defaults(func=cmd_show_current)
 
     a = sub.add_parser("new-lecture", help="Create next lecture")
@@ -469,6 +524,9 @@ def build_parser():
 
     a = sub.add_parser("pick-view", help="Pick lecture include view (last/all/etc)")
     a.set_defaults(func=cmd_pick_view)
+
+    a = sub.add_parser("list-templates", help="List available notebook templates")
+    a.set_defaults(func=cmd_list_templates)
 
     return p
 

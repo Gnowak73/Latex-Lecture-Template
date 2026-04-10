@@ -8,7 +8,7 @@ Main goal: keep note-taking fast in Neovim, make figure drawing easy in Inkscape
 - organizes notes as `courses/` and `topics/`
 - creates lecture files like `lec_01.tex`, `lec_02.tex`, etc.
 - keeps a `master.tex` per notebook to compile everything together
-- uses a Gilles-Castel-style lecture layout (`report` class + lecture headers/macros in `templates/preamble.tex`)
+- supports multiple built-in layout templates (including Gilles Castel lecture-note styles)
 - supports Inkscape figures with quick create/edit flow
 - includes Neovim keymaps for daily use
 
@@ -60,7 +60,7 @@ source ~/.bashrc
 Create a course and set it active:
 
 ```bash
-notes init-course algebra --title "Algebra I" --short ALG1
+notes init-course algebra --title "Algebra I" --short ALG1 --template template1
 notes set-current algebra
 ```
 
@@ -103,7 +103,7 @@ The source config is in `nvim/`, and `scripts/install_nvim_config.sh` copies it 
 
 ### Snippets (UltiSnips)
 
-This repo configures UltiSnips triggers (`Tab` / `Shift-Tab`) and notebook-local snippet loading from `UltiSnips/tex.snippets`.
+This repo configures UltiSnips triggers (`Tab` / `Shift-Tab`) and notebook-local snippet loading from `UltiSnips/tex.snippets` (Gilles Castel snippet file is included in `templates/tex.snippets`).
 
 You still need to install the plugins in your Neovim setup:
 
@@ -118,10 +118,9 @@ Quick check inside Neovim:
 
 `2` means UltiSnips is loaded.
 
-TeX `<Tab>` behavior:
+In TeX files, `<Tab>` / `<S-Tab>` are handled by UltiSnips for expand/jump.
 
-- if UltiSnips is loaded: expand/jump snippet
-- otherwise: insert a literal tab (no LSP snippet parsing)
+If you see `E319: No "python3" provider found`, install `pynvim` for your Neovim python and re-run `:checkhealth vim.provider`.
 
 ## Commands reference
 
@@ -137,3 +136,23 @@ Personal/local stuff is ignored by `.gitignore`:
 - `.current_course`
 - `courses/`
 - `topics/`
+Template options:
+
+```bash
+notes list-templates
+```
+
+Current built-ins:
+
+- `template1`
+- `template2`
+- `template3`
+- `template4`
+
+You can use `--template <name>` with both `notes init-course` and `notes init-topic`.
+Each template maps to its own preamble file:
+
+- `template1` -> `templates/preambles/template1.tex`
+- `template2` -> `templates/preambles/template2.tex`
+- `template3` -> `templates/preambles/template3.tex`
+- `template4` -> `templates/preambles/template4.tex`
