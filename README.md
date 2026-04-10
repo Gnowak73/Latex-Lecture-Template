@@ -100,6 +100,23 @@ notes pick-figure
 
 The source config is in `nvim/`, and `scripts/install_nvim_config.sh` copies it to `~/.config/nvim`.
 
+### Snippets (UltiSnips)
+
+This repo configures UltiSnips triggers (`Tab` / `Shift-Tab`) and notebook-local snippet loading from `UltiSnips/tex.snippets`.
+
+You still need to install the plugins in your Neovim setup:
+
+- `lervag/vimtex`
+- `SirVer/ultisnips`
+
+Quick check inside Neovim:
+
+```vim
+:echo exists('*UltiSnips#ExpandSnippet')
+```
+
+`1` means snippet expansion is active.
+
 ## Commands reference
 
 Full command list is here:

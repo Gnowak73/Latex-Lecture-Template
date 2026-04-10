@@ -63,3 +63,7 @@ Figure management:
 Figure picker dependency:
 
 - install `choose-gui`; executable can be `choose-gui` or `choose`
+
+Snippet dependencies:
+
+- install `lervag/vimtex` and `SirVer/ultisnips`

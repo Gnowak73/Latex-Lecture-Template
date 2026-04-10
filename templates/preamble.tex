@@ -4,17 +4,13 @@
 \usepackage{textcomp}
 \usepackage{newtxtext,newtxmath}
 \usepackage{microtype}
-\usepackage[dutch]{babel}
-\addto\captionsdutch{\renewcommand{\contentsname}{Contents}}
+\usepackage[english]{babel}
+\renewcommand{\contentsname}{Contents}
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{booktabs}
 \usepackage{enumitem}
-\makeatletter
-\newif\ifrevtexclass
-\@ifclassloaded{revtex4-2}{\revtexclasstrue}{\revtexclassfalse}
-\makeatother
 
 \pdfminorversion=7
 
@@ -24,19 +20,14 @@
 % Hide page number when page is empty
 \usepackage{emptypage}
 \usepackage{subcaption}
-\ifrevtexclass\else
 \usepackage{multicol}
-\fi
 \usepackage{xcolor}
 
 % Other font I sometimes use.
 % \usepackage{cmbright}
 
 % Math stuff
-\usepackage{amsmath, amsfonts, mathtools}
-\ifrevtexclass\else
-\usepackage{amsthm, amssymb}
-\fi
+\usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb}
 % Fancy script capitals
 \usepackage{mathrsfs}
 \usepackage{cancel}
@@ -88,11 +79,10 @@
 \sisetup{locale = FR}
 
 % Environments
-\makeatother
 % For box around Definition, Theorem, \ldots
 \usepackage{mdframed}
 \mdfsetup{skipabove=1em,skipbelow=0em}
-\@ifundefined{theoremstyle}{}{\theoremstyle{definition}}
+\theoremstyle{definition}
 \newmdtheoremenv[nobreak=true]{definitie}{Definitie}
 \newmdtheoremenv[nobreak=true]{eigenschap}{Eigenschap}
 \newmdtheoremenv[nobreak=true]{gevolg}{Gevolg}
