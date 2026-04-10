@@ -191,7 +191,9 @@ def cmd_new_lecture(args):
     files = lecture_files(path)
     number = int(files[-1].stem.split("_")[1]) + 1 if files else 1
     fname = path / f"lec_{number:02d}.tex"
-    date = dt.datetime.now().strftime(DATE_FORMAT)
+    raw_date = dt.datetime.now().strftime(DATE_FORMAT)
+    # Normalize capitalization for month/day abbreviations across locales.
+    date = " ".join(part.capitalize() if part.isalpha() else part for part in raw_date.split())
     title = args.title or ""
     fname.write_text(f"\\lecture{{{number}}}{{{date}}}{{{title}}}\n", encoding="utf-8")
 
