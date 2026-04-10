@@ -354,6 +354,8 @@ def cmd_pick_lecture(args):
         entry = f"{meta['number']:02d}  {meta['date']}  {meta['title']}"
         entries.append(entry)
         lookup[entry] = meta["number"]
+        # Some pickers normalize repeated spaces in selected output.
+        lookup[" ".join(entry.split())] = meta["number"]
     if not entries:
         print("No lectures found in current course. Create one with: notes new-lecture --title \"...\"")
         return
@@ -362,8 +364,13 @@ def cmd_pick_lecture(args):
     if not selected:
         print("No lecture selected.")
         return
-    n = lookup.get(selected)
+    n = lookup.get(selected) or lookup.get(" ".join(selected.split()))
     if n is None:
+        m = re.match(r"^\s*(\d+)\b", selected)
+        if m:
+            n = int(m.group(1))
+    if n is None:
+        print(f"Could not resolve selected lecture: {selected}")
         return
     cmd_open_lecture(argparse.Namespace(which=str(n)))
     if args.include:
