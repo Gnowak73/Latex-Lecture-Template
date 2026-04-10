@@ -1,7 +1,0 @@
-WRN 2026-04-09T21:35:42.348 ?.99283    server_start:199: Failed to start server: operation not permitted: /var/folders/4f/681y798x18s4gtxn90gxq9qc0000gn/T/nvim.gabe/OdYFPS/nvim.99283.0
-WRN 2026-04-09T21:37:00.583 ?.99676    server_start:199: Failed to start server: operation not permitted: /var/folders/4f/681y798x18s4gtxn90gxq9qc0000gn/T/nvim.gabe/Q8PbWC/nvim.99676.0
-WRN 2026-04-10T03:42:32.321 ?.29194    server_start:199: Failed to start server: operation not permitted: /var/folders/4f/681y798x18s4gtxn90gxq9qc0000gn/T/nvim.gabe/tb7ETr/nvim.29194.0
-WRN 2026-04-10T03:42:50.882 ?.29258    server_start:199: Failed to start server: operation not permitted: /var/folders/4f/681y798x18s4gtxn90gxq9qc0000gn/T/nvim.gabe/iXtaMK/nvim.29258.0
-WRN 2026-04-10T03:49:41.702 ?.31922    server_start:199: Failed to start server: operation not permitted: /var/folders/4f/681y798x18s4gtxn90gxq9qc0000gn/T/nvim.gabe/GNVATT/nvim.31922.0
-WRN 2026-04-10T03:51:51.170 ?.32630    server_start:199: Failed to start server: operation not permitted: /var/folders/4f/681y798x18s4gtxn90gxq9qc0000gn/T/nvim.gabe/pKwN8e/nvim.32630.0
-WRN 2026-04-10T03:52:39.510 ?.32862    server_start:199: Failed to start server: operation not permitted: /var/folders/4f/681y798x18s4gtxn90gxq9qc0000gn/T/nvim.gabe/HIH2aP/nvim.32862.0
