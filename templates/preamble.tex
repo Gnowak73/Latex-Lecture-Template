@@ -11,6 +11,10 @@
 \usepackage{float}
 \usepackage{booktabs}
 \usepackage{enumitem}
+\makeatletter
+\newif\ifrevtexclass
+\@ifclassloaded{revtex4-2}{\revtexclasstrue}{\revtexclassfalse}
+\makeatother
 
 \pdfminorversion=7
 
@@ -20,14 +24,19 @@
 % Hide page number when page is empty
 \usepackage{emptypage}
 \usepackage{subcaption}
+\ifrevtexclass\else
 \usepackage{multicol}
+\fi
 \usepackage{xcolor}
 
 % Other font I sometimes use.
 % \usepackage{cmbright}
 
 % Math stuff
-\usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb}
+\usepackage{amsmath, amsfonts, mathtools}
+\ifrevtexclass\else
+\usepackage{amsthm, amssymb}
+\fi
 % Fancy script capitals
 \usepackage{mathrsfs}
 \usepackage{cancel}
@@ -83,7 +92,7 @@
 % For box around Definition, Theorem, \ldots
 \usepackage{mdframed}
 \mdfsetup{skipabove=1em,skipbelow=0em}
-\theoremstyle{definition}
+\@ifundefined{theoremstyle}{}{\theoremstyle{definition}}
 \newmdtheoremenv[nobreak=true]{definitie}{Definitie}
 \newmdtheoremenv[nobreak=true]{eigenschap}{Eigenschap}
 \newmdtheoremenv[nobreak=true]{gevolg}{Gevolg}
@@ -265,4 +274,4 @@
 
 
 % My name
-\author{Gabriel Nowaskie}
+% Set \author in the document template (master.tex), not here.

@@ -19,9 +19,10 @@ DATE_FORMAT = "%a %d %b %Y %H:%M"
 SNIPPETS_TEMPLATE = ROOT / "templates" / "tex.snippets"
 FIGURE_TEMPLATE = ROOT / "templates" / "template.svg"
 
-MASTER_TEMPLATE = """\\documentclass[aps,onecolumn]{{revtex4-2}}
+MASTER_TEMPLATE = """\\documentclass[aps,pra,10pt,onecolumn]{{revtex4-2}}
 \\input{{../../templates/preamble.tex}}
 \\title{{{title}}}
+\\author{{Gabriel Nowaskie}}
 \\begin{{document}}
     \\maketitle
     \\tableofcontents
