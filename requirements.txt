@@ -1,0 +1,5 @@
+click
+daemonize
+appdirs
+pyperclip
+PyYAML

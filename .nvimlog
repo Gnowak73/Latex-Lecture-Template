@@ -1,0 +1,2 @@
+WRN 2026-04-09T21:35:42.348 ?.99283    server_start:199: Failed to start server: operation not permitted: /var/folders/4f/681y798x18s4gtxn90gxq9qc0000gn/T/nvim.gabe/OdYFPS/nvim.99283.0
+WRN 2026-04-09T21:37:00.583 ?.99676    server_start:199: Failed to start server: operation not permitted: /var/folders/4f/681y798x18s4gtxn90gxq9qc0000gn/T/nvim.gabe/Q8PbWC/nvim.99676.0

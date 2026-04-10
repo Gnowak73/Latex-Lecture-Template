@@ -1,0 +1,13 @@
+.DS_Store
+__pycache__/
+*.pyc
+
+.venv/
+.current_course
+
+courses/
+topics/
+
+config/figure-manager/template.svg
+config/figure-manager/template.pdf
+config/figure-manager/template.pdf_tex
