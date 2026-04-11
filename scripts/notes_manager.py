@@ -21,10 +21,21 @@ FIGURE_TEMPLATE = ROOT / "templates" / "template.svg"
 PREAMBLES_DIR = ROOT / "templates" / "preambles"
 
 TEMPLATE_PREAMBLES = {
-    "template1": PREAMBLES_DIR / "template1.tex",
-    "template2": PREAMBLES_DIR / "template2.tex",
-    "template3": PREAMBLES_DIR / "template3.tex",
-    "template4": PREAMBLES_DIR / "template4.tex",
+    "lecture-color": PREAMBLES_DIR / "template1.tex",
+    "lecture-light": PREAMBLES_DIR / "template2.tex",
+    "lecture-dynamic": PREAMBLES_DIR / "template3.tex",
+    "lecture-book": PREAMBLES_DIR / "template4.tex",
+}
+
+TEMPLATE_ALIASES = {
+    "1": "lecture-color",
+    "2": "lecture-light",
+    "3": "lecture-dynamic",
+    "4": "lecture-book",
+    "template1": "lecture-color",
+    "template2": "lecture-light",
+    "template3": "lecture-dynamic",
+    "template4": "lecture-book",
 }
 
 MASTER_TEMPLATE = """\\documentclass[a4paper]{{report}}
@@ -130,13 +141,24 @@ def current_course_path() -> Path:
 
 
 def selected_preamble_template(name: str) -> Path:
-    preamble = TEMPLATE_PREAMBLES.get(name)
+    normalized = normalize_template_name(name)
+    preamble = TEMPLATE_PREAMBLES.get(normalized)
     if preamble is None:
         available = ", ".join(sorted(TEMPLATE_PREAMBLES.keys()))
         raise SystemExit(f"Unknown template '{name}'. Available: {available}")
     if not preamble.exists():
         raise SystemExit(f"Template file is missing: {preamble}")
     return preamble
+
+
+def normalize_template_name(name: str) -> str:
+    key = name.strip().lower()
+    if key in TEMPLATE_ALIASES:
+        return TEMPLATE_ALIASES[key]
+    if key in TEMPLATE_PREAMBLES:
+        return key
+    available = ", ".join(sorted(TEMPLATE_PREAMBLES.keys()))
+    raise SystemExit(f"Unknown template '{name}'. Available: {available} (or 1-4)")
 
 
 def write_notebook_preamble(path: Path, template_name: str):
@@ -156,6 +178,7 @@ def write_notebook_preamble(path: Path, template_name: str):
 
 
 def init_notebook(path: Path, title: str, short: str, url: str, template: str):
+    template = normalize_template_name(template)
     path.mkdir(parents=True, exist_ok=True)
     (path / "figures").mkdir(exist_ok=True)
     (path / "UltiSnips").mkdir(exist_ok=True)
@@ -435,8 +458,10 @@ def cmd_pick_view(_args):
 
 
 def cmd_list_templates(_args):
-    for name in sorted(TEMPLATE_PREAMBLES.keys()):
-        print(name)
+    print("1  lecture-color")
+    print("2  lecture-light")
+    print("3  lecture-dynamic")
+    print("4  lecture-book")
 
 
 def build_parser():
@@ -450,9 +475,8 @@ def build_parser():
     a.add_argument("--url", default="https://")
     a.add_argument(
         "--template",
-        default="template1",
-        choices=sorted(TEMPLATE_PREAMBLES.keys()),
-        help="Notebook template style",
+        default="lecture-color",
+        help="Notebook template style (lecture-color|lecture-light|lecture-dynamic|lecture-book or 1-4)",
     )
     a.set_defaults(func=cmd_init_course)
 
@@ -466,9 +490,8 @@ def build_parser():
     a.add_argument("--url", default="https://")
     a.add_argument(
         "--template",
-        default="template1",
-        choices=sorted(TEMPLATE_PREAMBLES.keys()),
-        help="Notebook template style",
+        default="lecture-color",
+        help="Notebook template style (lecture-color|lecture-light|lecture-dynamic|lecture-book or 1-4)",
     )
     a.set_defaults(func=cmd_init_topic)
 

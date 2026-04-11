@@ -60,7 +60,7 @@ source ~/.bashrc
 Create a course and set it active:
 
 ```bash
-notes init-course algebra --title "Algebra I" --short ALG1 --template template1
+notes init-course algebra --title "Algebra I" --short ALG1 --template lecture-color
 notes set-current algebra
 ```
 
@@ -144,15 +144,15 @@ notes list-templates
 
 Current built-ins:
 
-- `template1`
-- `template2`
-- `template3`
-- `template4`
+- `lecture-color` (or `1`)
+- `lecture-light` (or `2`)
+- `lecture-dynamic` (or `3`)
+- `lecture-book` (or `4`)
 
 You can use `--template <name>` with both `notes init-course` and `notes init-topic`.
 Each template maps to its own preamble file:
 
-- `template1` -> `templates/preambles/template1.tex`
-- `template2` -> `templates/preambles/template2.tex`
-- `template3` -> `templates/preambles/template3.tex`
-- `template4` -> `templates/preambles/template4.tex`
+- `lecture-color` -> `templates/preambles/template1.tex`
+- `lecture-light` -> `templates/preambles/template2.tex`
+- `lecture-dynamic` -> `templates/preambles/template3.tex`
+- `lecture-book` -> `templates/preambles/template4.tex`

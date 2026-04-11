@@ -41,15 +41,15 @@ Template defaults:
 - new notebooks use `\documentclass[a4paper]{report}`
 - each notebook gets a local `preamble.tex` at creation time
 - available templates:
-  - `template1`
-  - `template2`
-  - `template3`
-  - `template4`
+  - `lecture-color` (or `1`)
+  - `lecture-light` (or `2`)
+  - `lecture-dynamic` (or `3`)
+  - `lecture-book` (or `4`)
 - file mapping:
-  - `template1` -> `templates/preambles/template1.tex`
-  - `template2` -> `templates/preambles/template2.tex`
-  - `template3` -> `templates/preambles/template3.tex`
-  - `template4` -> `templates/preambles/template4.tex`
+  - `lecture-color` -> `templates/preambles/template1.tex`
+  - `lecture-light` -> `templates/preambles/template2.tex`
+  - `lecture-dynamic` -> `templates/preambles/template3.tex`
+  - `lecture-book` -> `templates/preambles/template4.tex`
 
 Figure management:
 
