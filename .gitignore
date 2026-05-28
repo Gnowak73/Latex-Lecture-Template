@@ -10,5 +10,5 @@ __pycache__/
 courses/
 topics/
 
-# Figure-manager state (machine-specific absolute paths).
-config/figure-manager/roots
+# Figure-manager state (generated/machine-specific).
+config/figure-manager/

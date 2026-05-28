@@ -1,7 +1,6 @@
-# Inkscape figure manager.
+# Inkscape Figure Manager
 
-A script I use to manage figures for my LaTeX documents.
-More information in this [blog post](https://castel.dev/post/lecture-notes-2/).
+This is a small helper tool for managing Inkscape figures in LaTeX projects. It creates figures from a template, keeps `.svg` and `pdf+LaTeX` exports in sync, and provides a picker-driven “edit existing figure” workflow.
 
 ## Requirements
 
@@ -55,11 +54,20 @@ figures/
 
 ## Usage
 
-* Watch for figures: `inkscape-figures watch`.
-* Creating a figure: `inkscape-figures create 'title'`. This uses `~/.config/inkscape-figures/template.svg` as a template.
-* Creating a figure in a specific directory: `inkscape-figures create 'title' path/to/figures/`.
-* Select figure and edit it: `inkscape-figures edit`.
-* Select figure in a specific directory and edit it: `inkscape-figures edit path/to/figures/`.
+* Watch for figures: `inkscape-figures watch`
+* Create a figure: `inkscape-figures create 'title'` (uses `~/.config/inkscape-figures/template.svg` by default)
+* Create a figure in a directory: `inkscape-figures create 'title' path/to/figures/`
+* Pick and edit a figure: `inkscape-figures edit`
+* Pick and edit in a directory: `inkscape-figures edit path/to/figures/`
+
+## Integration Notes (This Repo)
+
+This repo wraps `inkscape-figures` via [`scripts/inkscape_figures.sh`](../../scripts/inkscape_figures.sh) and sets:
+
+- `INKSCAPE_FIGURES_CONFIG_DIR` to `<repo>/config/figure-manager/` (repo-local, so it doesn't touch global config)
+- the template to `<repo>/templates/template.svg` (copied into the config dir as `template.svg`)
+
+The actual figure template copied into each notebook lives at `templates/template.svg`.
 
 ## Vim mappings
 
