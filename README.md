@@ -1,113 +1,63 @@
-# My LaTeX Notes Setup (macOS)
+# LaTeX Notes (Neovim + Inkscape)
 
-This is my personal notes system for classes and random math/CS topics.  
-Main goal: keep note-taking fast in Neovim, make figure drawing easy in Inkscape, and keep everything organized without extra overhead.
+This repo is a small notes system for classes and math/physics scratchwork on macOS. The goal is practical: write fast in Neovim, drop in clean Inkscape figures without fuss, and keep everything organized.
 
-## What this project does
+Notes live in two buckets:
+- `courses/` for course notebooks
+- `topics/` for one-off notebooks (homework sets, ideas, short projects)
 
-- organizes notes as `courses/` and `topics/`
-- creates lecture files like `lec_01.tex`, `lec_02.tex`, etc.
-- keeps a `master.tex` per notebook to compile everything together
-- supports multiple built-in layout templates (including Gilles Castel lecture-note styles)
-- supports Inkscape figures with quick create/edit flow
-- includes Neovim keymaps for daily use
+Each notebook is self-contained (metadata, a `master.tex`, per-lecture/per-chapter files, figures, and local snippets).
 
-## Folder structure per notebook
-
-Each course/topic gets:
-
-- `info.yaml` for metadata
-- `master.tex` as the main compiled doc
-- `lec_XX.tex` lecture files
-- `figures/` for `.svg`, `.pdf`, `.pdf_tex`
-- `UltiSnips/tex.snippets`
-
-## Setup on macOS
+From the repo root:
 
 ```bash
-cd /Users/gabe/Github/Latex-Lecture-Template
-./scripts/setup_macos.sh
-export PATH="$PWD/bin:$PATH"
-./scripts/install_nvim_config.sh
+./scripts/setup_all.sh
 ```
 
-That installs required tools and sets up the Neovim config from this repo.
+That bootstraps the Python venv and installs the Neovim modules from this repo into `~/.config/nvim`. You can always run the tool as `./bin/notes ...`.
 
-## Permanent PATH for `notes`
-
-Temporary (current shell only):
+If you want `notes ...` to work anywhere, add this repo’s `bin/` to your shell `PATH`:
 
 ```bash
-export PATH="/Users/gabe/Github/Latex-Lecture-Template/bin:$PATH"
+export PATH="/absolute/path/to/Latex-Lecture-Template/bin:$PATH"
 ```
 
-Permanent on zsh:
+Put that line in `~/.zshrc` (zsh, default on macOS) or `~/.bashrc` (bash). If a subcommand is “missing”, you’re likely calling a different `notes` binary; check with:
 
 ```bash
-echo 'export PATH="/Users/gabe/Github/Latex-Lecture-Template/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
+which -a notes
 ```
 
-Permanent on bash:
+Create a course notebook and set it active:
 
 ```bash
-echo 'export PATH="/Users/gabe/Github/Latex-Lecture-Template/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
+./bin/notes init-course algebra --title "Algebra I" --short ALG1 --template lecture-color
+./bin/notes set-current algebra
 ```
 
-## Quick start
-
-Create a course and set it active:
+Add a lecture and compile:
 
 ```bash
-notes init-course algebra --title "Algebra I" --short ALG1 --template lecture-color
-notes set-current algebra
+./bin/notes new-lecture --title "Lecture 1"
+./bin/notes open-lecture last
+./bin/notes compile --current
 ```
 
-Create/open lecture and compile:
+Templates: multiple lecture-note templates (based on Gilles Castel’s layouts) plus `lecture-book` (tufte/masterthesis style). `lecture-book` always uses chapters (`chap_XX.tex` with `\chapter{...}`).
 
+In Neovim (leader is Space):
+- `Space+i` creates a new figure (writes a figure environment and opens Inkscape)
+- `Space+I` opens a picker to edit an existing figure
+
+The picker requires `choose-gui` (or `choose`) on your PATH. The figure flow also expects `inkscape` and (for auto-export watcher) `fswatch`.
+
+CLI equivalents:
 ```bash
-notes new-lecture --title "Lecture 1"
-notes open-lecture last
-notes compile --current
+./bin/notes list-figures
+./bin/notes pick-figure
 ```
 
-## Figures
-
-In Neovim:
-
-- `Space+i` creates a new figure and opens Inkscape
-- `Space+I` opens a searchable picker and edits a selected figure in Inkscape
-
-Picker requirement:
-
-- install `choose-gui` (used by figure search on both macOS and Linux)
-- picker executable can be either `choose-gui` or `choose`
-
-Troubleshooting:
-
-- if `Space+I` shows `No figures directory`, open a file in a notebook with a `figures/` folder
-- if it shows `No .svg figures found`, create a figure first with `Space+i`
-- if it shows `Picker not found`, install `choose-gui`
-
-CLI options:
-
-```bash
-notes list-figures
-notes pick-figure
-```
-
-## Neovim config note
-
-The source config is in `nvim/`, and `scripts/install_nvim_config.sh` copies it to `~/.config/nvim`.
-
-### Snippets (UltiSnips)
-
-This repo configures UltiSnips triggers (`Tab` / `Shift-Tab`) and notebook-local snippet loading from `UltiSnips/tex.snippets` (Gilles Castel snippet file is included in `templates/tex.snippets`).
-
-You still need to install the plugins in your Neovim setup:
-
-- `lervag/vimtex`
+Snippets: notebook-local snippets live at `UltiSnips/tex.snippets`. This repo ships a base snippet file in `templates/tex.snippets`, but snippets only work if you install UltiSnips in your Neovim plugin setup (and `vimtex` is strongly recommended).
 - `SirVer/ultisnips`
 
 Quick check inside Neovim:

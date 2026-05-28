@@ -19,6 +19,14 @@ DATE_FORMAT = "%a %d %b %Y %H:%M"
 SNIPPETS_TEMPLATE = ROOT / "templates" / "tex.snippets"
 FIGURE_TEMPLATE = ROOT / "templates" / "template.svg"
 PREAMBLES_DIR = ROOT / "templates" / "preambles"
+BOOK_TEMPLATE_DIR = ROOT / "templates" / "book"
+BOOK_PART_TEMPLATES: dict[str, Path] = {
+    "copyright": BOOK_TEMPLATE_DIR / "copyright.tex",
+    "preface": BOOK_TEMPLATE_DIR / "preface.tex",
+    "summary": BOOK_TEMPLATE_DIR / "summary.tex",
+    "conclusion": BOOK_TEMPLATE_DIR / "conclusion.tex",
+    "symbols": BOOK_TEMPLATE_DIR / "symbols.tex",
+}
 
 TEMPLATE_PREAMBLES = {
     "lecture-color": PREAMBLES_DIR / "template1.tex",
@@ -50,6 +58,171 @@ MASTER_TEMPLATE = """\\documentclass[a4paper]{{report}}
 \\end{{document}}
 """
 
+MASTER_TEMPLATE_BOOK_CHAPTERS = """\\documentclass[working]{{tuftebook}}
+
+\\input{{preamble.tex}}
+\\input{{symbols.tex}}
+\\title{{{title}}}
+\\author{{Gabriel Nowaskie}}
+\\date{{{date}}}
+\\begin{{document}}
+    % Title page (centered; works well with tuftebook's layout).
+    \\begin{{titlepage}}
+        \\thispagestyle{{empty}}
+        \\vspace*{{0.14\\textheight}}
+        \\begin{{fullwidth}}
+            \\centering
+            {{\\LARGE {title}\\par}}
+            \\vspace{{1.0em}}
+            {{\\large {author}\\par}}
+            \\vspace{{0.5em}}
+            {{\\large {date}\\par}}
+        \\end{{fullwidth}}
+        \\vfill
+    \\end{{titlepage}}
+
+    % Match upstream masterthesis conventions:
+    % roman numbering for frontmatter, plain style; arabic + "normal" style for main matter.
+    \\renewcommand{{\\thepage}}{{\\roman{{page}}}}
+    \\pagestyle{{plain}}
+    \\setcounter{{page}}{{0}}
+{frontmatter}
+    \\tableofcontents
+    \\cleardoublepage
+    \\renewcommand{{\\thepage}}{{\\arabic{{page}}}}
+    \\setcounter{{page}}{{1}}
+    \\pagestyle{{normal}}
+    % start chapters
+    % end chapters
+{backmatter}
+\\end{{document}}
+"""
+
+def rewrite_master_for_current_notebook(path: Path):
+    info = parse_info_yaml(path)
+    title = info.get("title", path.name)
+    template = normalize_template_name(info.get("template", "lecture-color"))
+    structure = notebook_structure(path)
+    existing_numbers = [parse_entry_number(p.stem) for p in lecture_files(path)]
+
+    master = path / "master.tex"
+    if template == "lecture-book":
+        # Optional masterthesis-style parts.
+        front_lines: list[str] = []
+        if (path / "copyright.tex").exists():
+            front_lines.append("    \\input{copyright.tex}")
+        if (path / "preface.tex").exists():
+            front_lines.append("    \\input{preface.tex}")
+        if (path / "summary.tex").exists():
+            front_lines.append("    \\input{summary.tex}")
+        symbols_path = path / "symbols.tex"
+        if symbols_path.exists():
+            try:
+                sym_txt = symbols_path.read_text(encoding="utf-8", errors="ignore")
+            except Exception:
+                sym_txt = ""
+            if "\\\\newcommand{\\\\listofsymbols}" in sym_txt or "\\\\def\\\\listofsymbols" in sym_txt:
+                front_lines.append("    \\listofsymbols")
+
+        back_lines: list[str] = []
+        if (path / "conclusion.tex").exists():
+            back_lines.append("    \\input{conclusion.tex}")
+
+        frontmatter = ("\n" + "\n".join(front_lines) + "\n") if front_lines else ""
+        backmatter = ("\n" + "\n".join(back_lines) + "\n") if back_lines else ""
+
+        date = dt.datetime.now().strftime("%B %Y")
+        master.write_text(
+            MASTER_TEMPLATE_BOOK_CHAPTERS.format(
+                title=title,
+                author="Gabriel Nowaskie",
+                date=date,
+                frontmatter=frontmatter,
+                backmatter=backmatter,
+            ),
+            encoding="utf-8",
+        )
+        # Repopulate the chapter list automatically (book notebooks always use chapters).
+        if existing_numbers:
+            update_master(path, existing_numbers)
+    else:
+        master.write_text(MASTER_TEMPLATE.format(title=title), encoding="utf-8")
+        # Keep behavior consistent with "notes new-lecture": default view is last two entries.
+        if existing_numbers:
+            include = existing_numbers[-2:] if len(existing_numbers) >= 2 else existing_numbers
+            update_master(path, include)
+
+
+def cmd_fix_master(_args):
+    path = current_course_path()
+    info = parse_info_yaml(path)
+    template = normalize_template_name(info.get("template", "lecture-color"))
+    if template == "lecture-book":
+        # Keep vendored class/sty in sync with templates/book.
+        for fname in ("tuftebook.cls", "marginfix.sty"):
+            src = BOOK_TEMPLATE_DIR / fname
+            dst = path / fname
+            if src.exists():
+                shutil.copy2(src, dst)
+    rewrite_master_for_current_notebook(path)
+    print(f"Rewrote master.tex for: {path.name}")
+
+
+def cmd_new_book_part(args):
+    path = current_course_path()
+    info = parse_info_yaml(path)
+    template = normalize_template_name(info.get("template", "lecture-color"))
+    if template != "lecture-book":
+        raise SystemExit("new-book-part is only available for template 'lecture-book'")
+
+    part = args.part.strip().lower()
+    if part not in BOOK_PART_TEMPLATES:
+        raise SystemExit(f"Unknown part '{part}'. Choose one of: {', '.join(BOOK_PART_TEMPLATES.keys())}")
+
+    src = BOOK_PART_TEMPLATES[part]
+    if not src.exists():
+        raise SystemExit(f"Missing template file: {src}")
+
+    dst_name = "symbols.tex" if part == "symbols" else f"{part}.tex"
+    dst = path / dst_name
+    if dst.exists() and not args.force:
+        raise SystemExit(f"{dst_name} already exists. Re-run with --force to overwrite.")
+    shutil.copy2(src, dst)
+    rewrite_master_for_current_notebook(path)
+    print(dst)
+
+def parse_info_yaml(path: Path) -> dict[str, str]:
+    info_path = path / "info.yaml"
+    if not info_path.exists():
+        return {}
+    info: dict[str, str] = {}
+    for line in info_path.read_text(encoding="utf-8").splitlines():
+        if ":" not in line:
+            continue
+        key, val = line.split(":", 1)
+        info[key.strip()] = val.strip().strip("'").strip('"')
+    return info
+
+
+def notebook_structure(path: Path) -> str:
+    info = parse_info_yaml(path)
+    structure = info.get("structure", "").strip().lower()
+    if structure in ("chapters", "lectures"):
+        return structure
+    return "lectures"
+
+
+def entry_prefix(structure: str) -> str:
+    return "chap_" if structure == "chapters" else "lec_"
+
+
+def entry_marker(structure: str) -> str:
+    return "chapters" if structure == "chapters" else "lectures"
+
+
+def parse_entry_number(stem: str) -> int:
+    m = re.search(r"_(\d+)$", stem)
+    return int(m.group(1)) if m else 0
 
 def notebook_dir(kind: str, name: str) -> Path:
     if kind == "course":
@@ -80,7 +253,15 @@ def read_lecture_meta(path: Path):
     line = path.read_text(encoding="utf-8").splitlines()[0] if path.exists() else ""
     m = re.search(r"lecture\{(.*?)\}\{(.*?)\}\{(.*)\}", line)
     if not m:
-        return None
+        m2 = re.search(r"\\chapter\{(.*)\}", line)
+        if not m2:
+            return None
+        return {
+            "number": parse_entry_number(path.stem),
+            "date": "",
+            "title": m2.group(1),
+            "file": path,
+        }
     return {
         "number": int(m.group(1)),
         "date": m.group(2),
@@ -90,22 +271,26 @@ def read_lecture_meta(path: Path):
 
 
 def lecture_files(path: Path):
-    files = sorted(path.glob("lec_*.tex"))
+    structure = notebook_structure(path)
+    files = sorted(path.glob(f"{entry_prefix(structure)}*.tex"))
     return files
 
 
 def update_master(course_path: Path, numbers: list[int]):
     master = course_path / "master.tex"
     text = master.read_text(encoding="utf-8")
-    start = text.find("% start lectures")
-    end = text.find("% end lectures")
+    structure = notebook_structure(course_path)
+    marker = entry_marker(structure)
+    start = text.find(f"% start {marker}")
+    end = text.find(f"% end {marker}")
     if start == -1 or end == -1 or end < start:
-        raise SystemExit("master.tex is missing '% start lectures'/'% end lectures' markers")
+        raise SystemExit(f"master.tex is missing '% start {marker}'/'% end {marker}' markers")
 
     start_line_end = text.find("\n", start)
     before = text[: start_line_end + 1]
     after = text[end:]
-    body = "".join(f"    \\input{{lec_{n:02d}.tex}}\n" for n in numbers)
+    prefix = entry_prefix(structure)
+    body = "".join(f"    \\input{{{prefix}{n:02d}.tex}}\n" for n in numbers)
     master.write_text(before + body + after, encoding="utf-8")
 
 
@@ -177,8 +362,16 @@ def write_notebook_preamble(path: Path, template_name: str):
     dst.write_text(text, encoding="utf-8")
 
 
-def init_notebook(path: Path, title: str, short: str, url: str, template: str):
+def init_notebook(path: Path, title: str, short: str, url: str, template: str, structure: str):
     template = normalize_template_name(template)
+    structure = structure.strip().lower()
+    if structure not in ("lectures", "chapters"):
+        raise SystemExit("Invalid --structure (use 'lectures' or 'chapters')")
+
+    # lecture-book is a thesis/book style; force chapter structure to avoid
+    # mixed semantics and to match the upstream masterthesis layout.
+    if template == "lecture-book":
+        structure = "chapters"
     path.mkdir(parents=True, exist_ok=True)
     (path / "figures").mkdir(exist_ok=True)
     (path / "UltiSnips").mkdir(exist_ok=True)
@@ -187,16 +380,47 @@ def init_notebook(path: Path, title: str, short: str, url: str, template: str):
         f"title: '{title}'\n"
         f"short: '{short}'\n"
         f"url: '{url}'\n"
+        f"template: '{template}'\n"
+        f"structure: '{structure}'\n"
     )
     (path / "info.yaml").write_text(info, encoding="utf-8")
 
     master = path / "master.tex"
     if not master.exists():
-        master.write_text(MASTER_TEMPLATE.format(title=title), encoding="utf-8")
+        if template == "lecture-book":
+            # Keep the "book" layout consistent with Gilles' masterthesis style.
+            date = dt.datetime.now().strftime("%B %Y")
+            master.write_text(
+                MASTER_TEMPLATE_BOOK_CHAPTERS.format(
+                    title=title,
+                    author="Gabriel Nowaskie",
+                    date=date,
+                    frontmatter="",
+                    backmatter="",
+                ),
+                encoding="utf-8",
+            )
+        else:
+            master.write_text(MASTER_TEMPLATE.format(title=title), encoding="utf-8")
 
     preamble = path / "preamble.tex"
     if not preamble.exists():
         write_notebook_preamble(path, template)
+
+    if template == "lecture-book":
+        # Vendor the class/sty files so the book template compiles without requiring
+        # a specific TeX Live installation.
+        for fname in ("tuftebook.cls", "marginfix.sty"):
+            src = BOOK_TEMPLATE_DIR / fname
+            dst = path / fname
+            if src.exists() and not dst.exists():
+                shutil.copy2(src, dst)
+        symbols = path / "symbols.tex"
+        if not symbols.exists():
+            symbols.write_text("% symbols.tex (optional)\n", encoding="utf-8")
+        bib = path / "bibliography.bib"
+        if not bib.exists():
+            bib.write_text("% bibliography.bib\n", encoding="utf-8")
 
     course_snippets = path / "UltiSnips" / "tex.snippets"
     if SNIPPETS_TEMPLATE.exists() and not course_snippets.exists():
@@ -209,7 +433,7 @@ def init_notebook(path: Path, title: str, short: str, url: str, template: str):
 
 def cmd_init_course(args):
     path = notebook_dir("course", args.name)
-    init_notebook(path, args.title, args.short, args.url, args.template)
+    init_notebook(path, args.title, args.short, args.url, args.template, args.structure)
     print(f"Initialized course at {path}")
 
 
@@ -223,7 +447,7 @@ def cmd_list_courses(_args):
 
 def cmd_init_topic(args):
     path = notebook_dir("topic", args.name)
-    init_notebook(path, args.title, args.short, args.url, args.template)
+    init_notebook(path, args.title, args.short, args.url, args.template, args.structure)
     print(f"Initialized topic at {path}")
 
 
@@ -250,14 +474,19 @@ def cmd_show_current(_args):
 
 def cmd_new_lecture(args):
     path = current_course_path()
+    structure = notebook_structure(path)
     files = lecture_files(path)
-    number = int(files[-1].stem.split("_")[1]) + 1 if files else 1
-    fname = path / f"lec_{number:02d}.tex"
+    number = parse_entry_number(files[-1].stem) + 1 if files else 1
+    fname = path / f"{entry_prefix(structure)}{number:02d}.tex"
     raw_date = dt.datetime.now().strftime(DATE_FORMAT)
     # Normalize capitalization for month/day abbreviations across locales.
     date = " ".join(part.capitalize() if part.isalpha() else part for part in raw_date.split())
     title = args.title or ""
-    fname.write_text(f"\\lecture{{{number}}}{{{date}}}{{{title}}}\n", encoding="utf-8")
+    if structure == "chapters":
+        chap_title = title if title else f"Chapter {number}"
+        fname.write_text(f"\\chapter{{{chap_title}}}\n", encoding="utf-8")
+    else:
+        fname.write_text(f"\\lecture{{{number}}}{{{date}}}{{{title}}}\n", encoding="utf-8")
 
     if number == 1:
         include = [1]
@@ -277,6 +506,7 @@ def cmd_list_lectures(_args):
 
 def cmd_open_lecture(args):
     path = current_course_path()
+    structure = notebook_structure(path)
     files = lecture_files(path)
     if not files:
         raise SystemExit("No lectures yet. Use: notes new-lecture")
@@ -286,7 +516,7 @@ def cmd_open_lecture(args):
         target = files[-1]
     else:
         n = int(args.which)
-        target = path / f"lec_{n:02d}.tex"
+        target = path / f"{entry_prefix(structure)}{n:02d}.tex"
         if not target.exists():
             raise SystemExit(f"Lecture file not found: {target.name}")
 
@@ -296,7 +526,7 @@ def cmd_open_lecture(args):
 
 def cmd_update_view(args):
     path = current_course_path()
-    numbers = [int(p.stem.split("_")[1]) for p in lecture_files(path)]
+    numbers = [parse_entry_number(p.stem) for p in lecture_files(path)]
     chosen = parse_range(args.spec, numbers)
     update_master(path, chosen)
     print(f"Updated master.tex with lectures: {chosen}")
@@ -473,6 +703,7 @@ def build_parser():
     a.add_argument("--title", required=True)
     a.add_argument("--short", required=True)
     a.add_argument("--url", default="https://")
+    a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for lecture-book (always chapters)")
     a.add_argument(
         "--template",
         default="lecture-color",
@@ -488,6 +719,7 @@ def build_parser():
     a.add_argument("--title", required=True)
     a.add_argument("--short", required=True)
     a.add_argument("--url", default="https://")
+    a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for lecture-book (always chapters)")
     a.add_argument(
         "--template",
         default="lecture-color",
@@ -504,6 +736,14 @@ def build_parser():
 
     a = sub.add_parser("show-current", help="Show active notebook")
     a.set_defaults(func=cmd_show_current)
+
+    a = sub.add_parser("fix-master", help="Regenerate master.tex for the current notebook template")
+    a.set_defaults(func=cmd_fix_master)
+
+    a = sub.add_parser("new-book-part", help="Create lecture-book front/back-matter files (copyright/preface/summary/symbols/conclusion)")
+    a.add_argument("part", help="copyright|preface|summary|symbols|conclusion")
+    a.add_argument("--force", action="store_true", help="Overwrite if the file already exists")
+    a.set_defaults(func=cmd_new_book_part)
 
     a = sub.add_parser("new-lecture", help="Create next lecture")
     a.add_argument("--title", default="")

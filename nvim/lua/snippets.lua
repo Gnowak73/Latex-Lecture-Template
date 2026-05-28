@@ -25,10 +25,34 @@ local function add_current_notebook_to_rtp()
   end
 end
 
--- UltiSnips configuration (compatible with Gilles Castel style workflow).
-vim.g.UltiSnipsExpandTrigger = "<tab>"
-vim.g.UltiSnipsJumpForwardTrigger = "<tab>"
-vim.g.UltiSnipsJumpBackwardTrigger = "<s-tab>"
+-- UltiSnips configuration.
+-- Keep built-in triggers disabled so our <Tab>/<S-Tab> maps can choose
+-- snippet actions only when available; otherwise they behave like normal keys.
+vim.g.UltiSnipsExpandTrigger = "<Nop>"
+vim.g.UltiSnipsJumpForwardTrigger = "<Nop>"
+vim.g.UltiSnipsJumpBackwardTrigger = "<Nop>"
 vim.g.UltiSnipsSnippetDirectories = { "UltiSnips" }
+
+local function has_ultisnips()
+  return vim.fn.exists("*UltiSnips#CanExpandSnippet") == 1
+end
+
+vim.keymap.set("i", "<Tab>", function()
+  if has_ultisnips() then
+    local can_expand = vim.fn["UltiSnips#CanExpandSnippet"]() == 1
+    local can_jump = vim.fn["UltiSnips#CanJumpForwards"]() == 1
+    if can_expand or can_jump then
+      return vim.api.nvim_replace_termcodes("<C-R>=UltiSnips#ExpandSnippetOrJump()<CR>", true, true, true)
+    end
+  end
+  return vim.api.nvim_replace_termcodes("<Tab>", true, true, true)
+end, { expr = true, silent = true, desc = "UltiSnips expand/jump or tab" })
+
+vim.keymap.set("i", "<S-Tab>", function()
+  if has_ultisnips() and vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
+    return vim.api.nvim_replace_termcodes("<C-R>=UltiSnips#JumpBackwards()<CR>", true, true, true)
+  end
+  return vim.api.nvim_replace_termcodes("<S-Tab>", true, true, true)
+end, { expr = true, silent = true, desc = "UltiSnips jump backward or shift-tab" })
 
 add_current_notebook_to_rtp()

@@ -4,11 +4,11 @@ __pycache__/
 
 .venv/
 .current_course
-
-courses/
-topics/
 .nvimlog
 
-config/figure-manager/template.svg
-config/figure-manager/template.pdf
-config/figure-manager/template.pdf_tex
+# Local note content (never commit personal notes).
+courses/
+topics/
+
+# Figure-manager state (machine-specific absolute paths).
+config/figure-manager/roots
