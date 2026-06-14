@@ -121,7 +121,7 @@ def rewrite_master_for_current_notebook(path: Path):
                 sym_txt = symbols_path.read_text(encoding="utf-8", errors="ignore")
             except Exception:
                 sym_txt = ""
-            if "\\\\newcommand{\\\\listofsymbols}" in sym_txt or "\\\\def\\\\listofsymbols" in sym_txt:
+            if "\\newcommand{\\listofsymbols}" in sym_txt or "\\def\\listofsymbols" in sym_txt:
                 front_lines.append("    \\listofsymbols")
 
         back_lines: list[str] = []
