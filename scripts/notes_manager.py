@@ -95,6 +95,7 @@ MASTER_TEMPLATE_BOOK_CHAPTERS = """\\documentclass[working]{{tuftebook}}
     % start chapters
     % end chapters
 {backmatter}
+    \\printbibliography
 \\end{{document}}
 """
 
