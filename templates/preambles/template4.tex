@@ -174,22 +174,39 @@
 % Scan-friendly heading wrappers for book notes. These preserve normal
 % numbering/ToC behavior while using the same sans-serif bold voice as the
 % theorem heads.
+\newcommand{\gheadfont}{\sffamily\bfseries}
+
 \NewDocumentCommand{\gchapter}{ o m }{%
   \IfNoValueTF{#1}
-    {\chapter[\texorpdfstring{#2}{#2}]{\texorpdfstring{\sffamily\bfseries #2}{#2}}}
-    {\chapter[#1]{\texorpdfstring{\sffamily\bfseries #2}{#2}}}%
+    {\chapter[#2]{\texorpdfstring{{\gheadfont #2}}{#2}}}
+    {\chapter[#1]{\texorpdfstring{{\gheadfont #2}}{#2}}}%
 }
 
 \NewDocumentCommand{\gsection}{ o m }{%
   \IfNoValueTF{#1}
-    {\section[\texorpdfstring{#2}{#2}]{\texorpdfstring{\sffamily\bfseries #2}{#2}}}
-    {\section[#1]{\texorpdfstring{\sffamily\bfseries #2}{#2}}}%
+    {\section[#2]{\texorpdfstring{{\gheadfont #2}}{#2}}}
+    {\section[#1]{\texorpdfstring{{\gheadfont #2}}{#2}}}%
 }
 
 \NewDocumentCommand{\gsubsection}{ o m }{%
   \IfNoValueTF{#1}
-    {\subsection[\texorpdfstring{#2}{#2}]{\texorpdfstring{\sffamily\bfseries #2}{#2}}}
-    {\subsection[#1]{\texorpdfstring{\sffamily\bfseries #2}{#2}}}%
+    {\subsection[#2]{\texorpdfstring{{\gheadfont #2}}{#2}}}
+    {\subsection[#1]{\texorpdfstring{{\gheadfont #2}}{#2}}}%
+}
+
+\newcommand{\gchapterstar}[1]{%
+  \chapter*{\texorpdfstring{{\gheadfont #1}}{#1}}%
+  \addcontentsline{toc}{chapter}{#1}%
+}
+
+\newcommand{\gsectionstar}[1]{%
+  \section*{\texorpdfstring{{\gheadfont #1}}{#1}}%
+  \addcontentsline{toc}{section}{#1}%
+}
+
+\newcommand{\gsubsectionstar}[1]{%
+  \subsection*{\texorpdfstring{{\gheadfont #1}}{#1}}%
+  \addcontentsline{toc}{subsection}{#1}%
 }
 
 \newenvironment{myproof}[1][\proofname]{%
