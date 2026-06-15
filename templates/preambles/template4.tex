@@ -170,6 +170,27 @@
 
 % \overfullrule=1mm
 
+% Scan-friendly heading wrappers for book notes. These preserve normal
+% numbering/ToC behavior while using the same sans-serif bold voice as the
+% theorem heads.
+\NewDocumentCommand{\gchapter}{ o m }{%
+  \IfNoValueTF{#1}
+    {\chapter[\texorpdfstring{#2}{#2}]{\texorpdfstring{\sffamily\bfseries #2}{#2}}}
+    {\chapter[#1]{\texorpdfstring{\sffamily\bfseries #2}{#2}}}%
+}
+
+\NewDocumentCommand{\gsection}{ o m }{%
+  \IfNoValueTF{#1}
+    {\section[\texorpdfstring{#2}{#2}]{\texorpdfstring{\sffamily\bfseries #2}{#2}}}
+    {\section[#1]{\texorpdfstring{\sffamily\bfseries #2}{#2}}}%
+}
+
+\NewDocumentCommand{\gsubsection}{ o m }{%
+  \IfNoValueTF{#1}
+    {\subsection[\texorpdfstring{#2}{#2}]{\texorpdfstring{\sffamily\bfseries #2}{#2}}}
+    {\subsection[#1]{\texorpdfstring{\sffamily\bfseries #2}{#2}}}%
+}
+
 \newenvironment{myproof}[1][\proofname]{%
   \proof[\rm \bf #1]%
 }{\endproof}

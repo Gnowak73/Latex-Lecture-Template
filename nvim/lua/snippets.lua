@@ -55,11 +55,4 @@ vim.keymap.set("i", "<S-Tab>", function()
   return vim.api.nvim_replace_termcodes("<S-Tab>", true, true, true)
 end, { expr = true, silent = true, desc = "UltiSnips jump backward or shift-tab" })
 
-vim.keymap.set("i", "<CR>", function()
-  if vim.bo.filetype == "tex" and vim.fn.pumvisible() == 1 then
-    return vim.api.nvim_replace_termcodes("<C-e><CR>", true, true, true)
-  end
-  return vim.api.nvim_replace_termcodes("<CR>", true, true, true)
-end, { expr = true, silent = true, desc = "Newline in TeX even when completion menu is open" })
-
 add_current_notebook_to_rtp()
