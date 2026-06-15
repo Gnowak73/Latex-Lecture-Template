@@ -176,37 +176,43 @@
 % theorem heads.
 \newcommand{\gheadfont}{\sffamily\bfseries}
 
-\NewDocumentCommand{\gchapter}{ o m }{%
-  \IfNoValueTF{#1}
-    {\chapter[#2]{\texorpdfstring{{\gheadfont #2}}{#2}}}
-    {\chapter[#1]{\texorpdfstring{{\gheadfont #2}}{#2}}}%
+\NewDocumentCommand{\gchapter}{ s o m }{%
+  \IfBooleanTF{#1}
+    {%
+      \chapter*{\texorpdfstring{{\gheadfont #3}}{#3}}%
+      \addcontentsline{toc}{chapter}{\IfNoValueTF{#2}{#3}{#2}}%
+    }
+    {%
+      \IfNoValueTF{#2}
+        {\chapter[#3]{\texorpdfstring{{\gheadfont #3}}{#3}}}
+        {\chapter[#2]{\texorpdfstring{{\gheadfont #3}}{#3}}}%
+    }%
 }
 
-\NewDocumentCommand{\gsection}{ o m }{%
-  \IfNoValueTF{#1}
-    {\section[#2]{\texorpdfstring{{\gheadfont #2}}{#2}}}
-    {\section[#1]{\texorpdfstring{{\gheadfont #2}}{#2}}}%
+\NewDocumentCommand{\gsection}{ s o m }{%
+  \IfBooleanTF{#1}
+    {%
+      \section*{\texorpdfstring{{\gheadfont #3}}{#3}}%
+      \addcontentsline{toc}{section}{\IfNoValueTF{#2}{#3}{#2}}%
+    }
+    {%
+      \IfNoValueTF{#2}
+        {\section[#3]{\texorpdfstring{{\gheadfont #3}}{#3}}}
+        {\section[#2]{\texorpdfstring{{\gheadfont #3}}{#3}}}%
+    }%
 }
 
-\NewDocumentCommand{\gsubsection}{ o m }{%
-  \IfNoValueTF{#1}
-    {\subsection[#2]{\texorpdfstring{{\gheadfont #2}}{#2}}}
-    {\subsection[#1]{\texorpdfstring{{\gheadfont #2}}{#2}}}%
-}
-
-\newcommand{\gchapterstar}[1]{%
-  \chapter*{\texorpdfstring{{\gheadfont #1}}{#1}}%
-  \addcontentsline{toc}{chapter}{#1}%
-}
-
-\newcommand{\gsectionstar}[1]{%
-  \section*{\texorpdfstring{{\gheadfont #1}}{#1}}%
-  \addcontentsline{toc}{section}{#1}%
-}
-
-\newcommand{\gsubsectionstar}[1]{%
-  \subsection*{\texorpdfstring{{\gheadfont #1}}{#1}}%
-  \addcontentsline{toc}{subsection}{#1}%
+\NewDocumentCommand{\gsubsection}{ s o m }{%
+  \IfBooleanTF{#1}
+    {%
+      \subsection*{\texorpdfstring{{\gheadfont #3}}{#3}}%
+      \addcontentsline{toc}{subsection}{\IfNoValueTF{#2}{#3}{#2}}%
+    }
+    {%
+      \IfNoValueTF{#2}
+        {\subsection[#3]{\texorpdfstring{{\gheadfont #3}}{#3}}}
+        {\subsection[#2]{\texorpdfstring{{\gheadfont #3}}{#3}}}%
+    }%
 }
 
 \newenvironment{myproof}[1][\proofname]{%
