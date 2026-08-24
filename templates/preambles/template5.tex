@@ -75,10 +75,10 @@
 \renewcommand{\theequation}{\thechapter-\arabic{equation}}
 
 \titleformat{\chapter}[display]
-  {\normalfont\fontseries{bx}\selectfont\centering}
+  {\normalfont\centering}
   {\MakeUppercase{\chaptername} \thechapter}
   {0.8em}
-  {\large\fontseries{bx}\selectfont\MakeUppercase}
+  {\large\MakeUppercase}
 \titlespacing*{\chapter}{0pt}{0.10\textheight}{2.0em}
 
 \titleformat{\section}[runin]
@@ -113,15 +113,15 @@
 \makeatletter
 \renewcommand{\@makechapterhead}[1]{%
   \vspace*{0.08\textheight}%
-  {\parindent \z@ \centering \normalfont\fontseries{bx}\selectfont
+  {\parindent \z@ \centering \normalfont
     \MakeUppercase{\chaptername}\space\thechapter\par
     \vskip 1.0em
-    \large\fontseries{bx}\selectfont\MakeUppercase{#1}\par\nobreak
+    \large\MakeUppercase{#1}\par\nobreak
     \vskip 2.0em}}
 \renewcommand{\@makeschapterhead}[1]{%
   \vspace*{0.08\textheight}%
-  {\parindent \z@ \centering \normalfont\fontseries{bx}\selectfont
-    \large\fontseries{bx}\selectfont\MakeUppercase{#1}\par\nobreak
+  {\parindent \z@ \centering \normalfont
+    \large\MakeUppercase{#1}\par\nobreak
     \vskip 2.0em}}
 \makeatother
 
