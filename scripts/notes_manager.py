@@ -23,6 +23,7 @@ BOOK_TEMPLATE_DIR = ROOT / "templates" / "book"
 BOOK_PART_TEMPLATES: dict[str, Path] = {
     "series": BOOK_TEMPLATE_DIR / "series.tex",
     "copyright": BOOK_TEMPLATE_DIR / "copyright.tex",
+    "dedication": BOOK_TEMPLATE_DIR / "dedication.tex",
     "preface": BOOK_TEMPLATE_DIR / "preface.tex",
     "summary": BOOK_TEMPLATE_DIR / "summary.tex",
     "conclusion": BOOK_TEMPLATE_DIR / "conclusion.tex",
@@ -110,7 +111,7 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openany]
 \\input{{preamble.tex}}
 \\input{{symbols.tex}}
 \\title{{{title}}}
-\\author{{Gabriel Nowaskie}}
+\\author{{{author}}}
 \\date{{{date}}}
 \\begin{{document}}
     \\frontmatter
@@ -133,9 +134,9 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openany]
             \\vspace{{2.4em}}
             {{\\normalsize BY\\par}}
             \\vspace{{1.2em}}
-            {{\\large\\MakeUppercase{{Gabriel Nowaskie}}\\par}}
+            {{\\large\\MakeUppercase{{{author}}}\\par}}
             \\vfill
-            {{\\normalsize ADDISON-WESLEY STYLE LECTURE NOTES\\par}}
+{publisherline}
             \\vspace{{0.5em}}
             {{\\normalsize {date}\\par}}
         \\end{{center}}
@@ -172,6 +173,9 @@ def symbols_define_list(path: Path) -> bool:
 def rewrite_master_for_current_notebook(path: Path):
     info = parse_info_yaml(path)
     title = info.get("title", path.name)
+    author = info.get("author", "Gabriel Nowaskie")
+    series = info.get("series", "").strip()
+    publisher = info.get("publisher", "").strip()
     template = normalize_template_name(info.get("template", "lecture-color"))
     structure = notebook_structure(path)
     existing_numbers = [parse_entry_number(p.stem) for p in lecture_files(path)]
@@ -186,9 +190,21 @@ def rewrite_master_for_current_notebook(path: Path):
         seriespage = ""
 
         if template == "classic-book":
-            if (path / "series.tex").exists():
+            if series:
+                seriespage = (
+                    "\n"
+                    "    \\begin{titlepage}\n"
+                    "        \\thispagestyle{empty}\n"
+                    "        \\vspace*{0.32\\textheight}\n"
+                    "        \\begin{center}\n"
+                    f"            {{\\normalsize\\MakeUppercase{{{series}}}\\par}}\n"
+                    "        \\end{center}\n"
+                    "        \\vfill\n"
+                    "    \\end{titlepage}\n"
+                )
+            elif (path / "series.tex").exists():
                 seriespage = "\n    \\input{series.tex}\n"
-            for part in ("copyright", "preface", "summary"):
+            for part in ("copyright", "dedication", "preface", "summary"):
                 if (path / f"{part}.tex").exists():
                     front_lines.append(f"    \\input{{{part}.tex}}")
             if (path / "conclusion.tex").exists():
@@ -213,6 +229,11 @@ def rewrite_master_for_current_notebook(path: Path):
         backmatter = ("\n" + "\n".join(back_lines) + "\n") if back_lines else ""
 
         date = dt.datetime.now().strftime("%B %Y")
+        publisherline = (
+            f"            {{\\normalsize\\MakeUppercase{{{publisher}}}\\par}}\n"
+            if publisher
+            else ""
+        )
         master_template = (
             MASTER_TEMPLATE_BOOK_CHAPTERS
             if template == "lecture-book"
@@ -221,9 +242,10 @@ def rewrite_master_for_current_notebook(path: Path):
         master.write_text(
             master_template.format(
                 title=title,
-                author="Gabriel Nowaskie",
+                author=author,
                 date=date,
                 seriespage=seriespage,
+                publisherline=publisherline,
                 frontmatter=frontmatter,
                 conclusion=conclusion,
                 backmatter=backmatter,
@@ -450,7 +472,17 @@ def write_notebook_preamble(path: Path, template_name: str):
     dst.write_text(text, encoding="utf-8")
 
 
-def init_notebook(path: Path, title: str, short: str, url: str, template: str, structure: str):
+def init_notebook(
+    path: Path,
+    title: str,
+    short: str,
+    url: str,
+    template: str,
+    structure: str,
+    author: str = "Gabriel Nowaskie",
+    series: str = "",
+    publisher: str = "",
+):
     template = normalize_template_name(template)
     structure = structure.strip().lower()
     if structure not in ("lectures", "chapters"):
@@ -467,6 +499,9 @@ def init_notebook(path: Path, title: str, short: str, url: str, template: str, s
         f"title: '{title}'\n"
         f"short: '{short}'\n"
         f"url: '{url}'\n"
+        f"author: '{author}'\n"
+        f"series: '{series}'\n"
+        f"publisher: '{publisher}'\n"
         f"template: '{template}'\n"
         f"structure: '{structure}'\n"
     )
@@ -484,9 +519,14 @@ def init_notebook(path: Path, title: str, short: str, url: str, template: str, s
             master.write_text(
                 master_template.format(
                     title=title,
-                    author="Gabriel Nowaskie",
+                    author=author,
                     date=date,
                     seriespage="",
+                    publisherline=(
+                        f"            {{\\normalsize\\MakeUppercase{{{publisher}}}\\par}}\n"
+                        if publisher
+                        else ""
+                    ),
                     frontmatter="",
                     conclusion="",
                     backmatter="",
@@ -533,7 +573,7 @@ def init_notebook(path: Path, title: str, short: str, url: str, template: str, s
 
 def cmd_init_course(args):
     path = notebook_dir("course", args.name)
-    init_notebook(path, args.title, args.short, args.url, args.template, args.structure)
+    init_notebook(path, args.title, args.short, args.url, args.template, args.structure, args.author, args.series, args.publisher)
     print(f"Initialized course at {path}")
 
 
@@ -547,7 +587,7 @@ def cmd_list_courses(_args):
 
 def cmd_init_topic(args):
     path = notebook_dir("topic", args.name)
-    init_notebook(path, args.title, args.short, args.url, args.template, args.structure)
+    init_notebook(path, args.title, args.short, args.url, args.template, args.structure, args.author, args.series, args.publisher)
     print(f"Initialized topic at {path}")
 
 
@@ -804,6 +844,9 @@ def build_parser():
     a.add_argument("--title", required=True)
     a.add_argument("--short", required=True)
     a.add_argument("--url", default="https://")
+    a.add_argument("--author", default="Gabriel Nowaskie")
+    a.add_argument("--series", default="", help="Optional classic-book series name")
+    a.add_argument("--publisher", default="", help="Optional classic-book publisher/imprint line")
     a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
     a.add_argument(
         "--template",
@@ -820,6 +863,9 @@ def build_parser():
     a.add_argument("--title", required=True)
     a.add_argument("--short", required=True)
     a.add_argument("--url", default="https://")
+    a.add_argument("--author", default="Gabriel Nowaskie")
+    a.add_argument("--series", default="", help="Optional classic-book series name")
+    a.add_argument("--publisher", default="", help="Optional classic-book publisher/imprint line")
     a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
     a.add_argument(
         "--template",

@@ -7,11 +7,11 @@
 \usepackage[
     paperwidth=6in,
     paperheight=9in,
-    inner=0.72in,
-    outer=0.58in,
-    top=0.70in,
+    inner=0.45in,
+    outer=0.72in,
+    top=0.60in,
     bottom=0.78in,
-    headsep=0.16in,
+    headsep=0.18in,
     footskip=0.30in
 ]{geometry}
 
@@ -66,6 +66,8 @@
 \linespread{1.02}
 \raggedbottom
 
+\renewcommand{\contentsname}{CONTENTS}
+
 \renewcommand{\thechapter}{\arabic{chapter}}
 \renewcommand{\thesection}{\thechapter-\arabic{section}}
 \renewcommand{\thesubsection}{\thesection-\arabic{subsection}}
@@ -73,10 +75,10 @@
 \renewcommand{\theequation}{\thechapter-\arabic{equation}}
 
 \titleformat{\chapter}[display]
-  {\normalfont\centering}
+  {\normalfont\bfseries\centering}
   {\MakeUppercase{\chaptername} \thechapter}
   {0.8em}
-  {\large\MakeUppercase}
+  {\large\bfseries\MakeUppercase}
 \titlespacing*{\chapter}{0pt}{0.10\textheight}{2.0em}
 
 \titleformat{\section}[runin]
@@ -95,18 +97,31 @@
   [.]
 \titlespacing*{\subsection}{0pt}{0.8em plus 0.2em minus 0.1em}{0.5em}
 
+\titlecontents{chapter}
+  [0pt]
+  {\vspace{1.1em}}
+  {Chapter \thecontentslabel.\quad}
+  {}
+  {\titlerule*[0.7pc]{.}\contentspage}
+\titlecontents{section}
+  [1.6em]
+  {}
+  {\contentslabel{2.4em}}
+  {}
+  {\titlerule*[0.7pc]{.}\contentspage}
+
 \makeatletter
 \renewcommand{\@makechapterhead}[1]{%
   \vspace*{0.08\textheight}%
-  {\parindent \z@ \centering \normalfont
+  {\parindent \z@ \centering \normalfont\bfseries
     \MakeUppercase{\chaptername}\space\thechapter\par
     \vskip 1.0em
-    \large\MakeUppercase{#1}\par\nobreak
+    \large\bfseries\MakeUppercase{#1}\par\nobreak
     \vskip 2.0em}}
 \renewcommand{\@makeschapterhead}[1]{%
   \vspace*{0.08\textheight}%
-  {\parindent \z@ \centering \normalfont
-    \large\MakeUppercase{#1}\par\nobreak
+  {\parindent \z@ \centering \normalfont\bfseries
+    \large\bfseries\MakeUppercase{#1}\par\nobreak
     \vskip 2.0em}}
 \makeatother
 
@@ -121,7 +136,7 @@
 
 \fancypagestyle{plain}{%
     \fancyhf{}%
-    \fancyfoot[C]{\thepage}%
+    \fancyhead[LE,RO]{\thepage}%
     \renewcommand{\headrulewidth}{0pt}%
     \renewcommand{\footrulewidth}{0pt}%
 }
