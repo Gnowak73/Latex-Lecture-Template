@@ -21,11 +21,14 @@ FIGURE_TEMPLATE = ROOT / "templates" / "template.svg"
 PREAMBLES_DIR = ROOT / "templates" / "preambles"
 BOOK_TEMPLATE_DIR = ROOT / "templates" / "book"
 BOOK_PART_TEMPLATES: dict[str, Path] = {
+    "series": BOOK_TEMPLATE_DIR / "series.tex",
     "copyright": BOOK_TEMPLATE_DIR / "copyright.tex",
     "preface": BOOK_TEMPLATE_DIR / "preface.tex",
     "summary": BOOK_TEMPLATE_DIR / "summary.tex",
     "conclusion": BOOK_TEMPLATE_DIR / "conclusion.tex",
+    "answers": BOOK_TEMPLATE_DIR / "answers.tex",
     "symbols": BOOK_TEMPLATE_DIR / "symbols.tex",
+    "index": BOOK_TEMPLATE_DIR / "index.tex",
 }
 
 TEMPLATE_PREAMBLES = {
@@ -33,6 +36,7 @@ TEMPLATE_PREAMBLES = {
     "lecture-light": PREAMBLES_DIR / "template2.tex",
     "lecture-dynamic": PREAMBLES_DIR / "template3.tex",
     "lecture-book": PREAMBLES_DIR / "template4.tex",
+    "classic-book": PREAMBLES_DIR / "template5.tex",
 }
 
 TEMPLATE_ALIASES = {
@@ -40,10 +44,12 @@ TEMPLATE_ALIASES = {
     "2": "lecture-light",
     "3": "lecture-dynamic",
     "4": "lecture-book",
+    "5": "classic-book",
     "template1": "lecture-color",
     "template2": "lecture-light",
     "template3": "lecture-dynamic",
     "template4": "lecture-book",
+    "template5": "classic-book",
 }
 
 MASTER_TEMPLATE = """\\documentclass[a4paper]{{report}}
@@ -99,6 +105,70 @@ MASTER_TEMPLATE_BOOK_CHAPTERS = """\\documentclass[working]{{tuftebook}}
 \\end{{document}}
 """
 
+MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openany]{{book}}
+
+\\input{{preamble.tex}}
+\\input{{symbols.tex}}
+\\title{{{title}}}
+\\author{{Gabriel Nowaskie}}
+\\date{{{date}}}
+\\begin{{document}}
+    \\frontmatter
+    \\hypersetup{{pageanchor=false}}
+    \\begin{{titlepage}}
+        \\thispagestyle{{empty}}
+        \\vspace*{{0.22\\textheight}}
+        \\begin{{center}}
+            {{\\Large\\MakeUppercase{{{title}}}\\par}}
+        \\end{{center}}
+        \\vfill
+    \\end{{titlepage}}
+
+{seriespage}
+    \\begin{{titlepage}}
+        \\thispagestyle{{empty}}
+        \\vspace*{{0.16\\textheight}}
+        \\begin{{center}}
+            {{\\Large\\MakeUppercase{{{title}}}\\par}}
+            \\vspace{{2.4em}}
+            {{\\normalsize BY\\par}}
+            \\vspace{{1.2em}}
+            {{\\large\\MakeUppercase{{Gabriel Nowaskie}}\\par}}
+            \\vfill
+            {{\\normalsize ADDISON-WESLEY STYLE LECTURE NOTES\\par}}
+            \\vspace{{0.5em}}
+            {{\\normalsize {date}\\par}}
+        \\end{{center}}
+    \\end{{titlepage}}
+    \\hypersetup{{pageanchor=true}}
+{frontmatter}
+    \\tableofcontents
+    \\cleardoublepage
+    \\mainmatter
+    % start chapters
+    % end chapters
+    \\backmatter
+{conclusion}
+    \\printbibliography
+{backmatter}
+\\end{{document}}
+"""
+
+
+def is_book_template(template: str) -> bool:
+    return template in {"lecture-book", "classic-book"}
+
+
+def symbols_define_list(path: Path) -> bool:
+    if not path.exists():
+        return False
+    try:
+        sym_txt = path.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return False
+    return "\\newcommand{\\listofsymbols}" in sym_txt or "\\def\\listofsymbols" in sym_txt
+
+
 def rewrite_master_for_current_notebook(path: Path):
     info = parse_info_yaml(path)
     title = info.get("title", path.name)
@@ -107,38 +177,55 @@ def rewrite_master_for_current_notebook(path: Path):
     existing_numbers = [parse_entry_number(p.stem) for p in lecture_files(path)]
 
     master = path / "master.tex"
-    if template == "lecture-book":
-        # Optional masterthesis-style parts.
+    if is_book_template(template):
+        # Optional book parts. classic-book follows the Symon-style order:
+        # title matter, preface, contents, chapters, bibliography, answers, symbols, index.
         front_lines: list[str] = []
-        if (path / "copyright.tex").exists():
-            front_lines.append("    \\input{copyright.tex}")
-        if (path / "preface.tex").exists():
-            front_lines.append("    \\input{preface.tex}")
-        if (path / "summary.tex").exists():
-            front_lines.append("    \\input{summary.tex}")
-        symbols_path = path / "symbols.tex"
-        if symbols_path.exists():
-            try:
-                sym_txt = symbols_path.read_text(encoding="utf-8", errors="ignore")
-            except Exception:
-                sym_txt = ""
-            if "\\newcommand{\\listofsymbols}" in sym_txt or "\\def\\listofsymbols" in sym_txt:
-                front_lines.append("    \\listofsymbols")
-
         back_lines: list[str] = []
-        if (path / "conclusion.tex").exists():
-            back_lines.append("    \\input{conclusion.tex}")
+        conclusion_lines: list[str] = []
+        seriespage = ""
+
+        if template == "classic-book":
+            if (path / "series.tex").exists():
+                seriespage = "\n    \\input{series.tex}\n"
+            for part in ("copyright", "preface", "summary"):
+                if (path / f"{part}.tex").exists():
+                    front_lines.append(f"    \\input{{{part}.tex}}")
+            if (path / "conclusion.tex").exists():
+                conclusion_lines.append("    \\input{conclusion.tex}")
+            if (path / "answers.tex").exists():
+                back_lines.append("    \\input{answers.tex}")
+            if symbols_define_list(path / "symbols.tex"):
+                back_lines.append("    \\listofsymbols")
+            if (path / "index.tex").exists():
+                back_lines.append("    \\input{index.tex}")
+        else:
+            for part in ("copyright", "preface", "summary"):
+                if (path / f"{part}.tex").exists():
+                    front_lines.append(f"    \\input{{{part}.tex}}")
+            if symbols_define_list(path / "symbols.tex"):
+                front_lines.append("    \\listofsymbols")
+            if (path / "conclusion.tex").exists():
+                back_lines.append("    \\input{conclusion.tex}")
 
         frontmatter = ("\n" + "\n".join(front_lines) + "\n") if front_lines else ""
+        conclusion = ("\n" + "\n".join(conclusion_lines) + "\n") if conclusion_lines else ""
         backmatter = ("\n" + "\n".join(back_lines) + "\n") if back_lines else ""
 
         date = dt.datetime.now().strftime("%B %Y")
+        master_template = (
+            MASTER_TEMPLATE_BOOK_CHAPTERS
+            if template == "lecture-book"
+            else MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS
+        )
         master.write_text(
-            MASTER_TEMPLATE_BOOK_CHAPTERS.format(
+            master_template.format(
                 title=title,
                 author="Gabriel Nowaskie",
                 date=date,
+                seriespage=seriespage,
                 frontmatter=frontmatter,
+                conclusion=conclusion,
                 backmatter=backmatter,
             ),
             encoding="utf-8",
@@ -173,8 +260,8 @@ def cmd_new_book_part(args):
     path = current_course_path()
     info = parse_info_yaml(path)
     template = normalize_template_name(info.get("template", "lecture-color"))
-    if template != "lecture-book":
-        raise SystemExit("new-book-part is only available for template 'lecture-book'")
+    if not is_book_template(template):
+        raise SystemExit("new-book-part is only available for book templates")
 
     part = args.part.strip().lower()
     if part not in BOOK_PART_TEMPLATES:
@@ -344,7 +431,7 @@ def normalize_template_name(name: str) -> str:
     if key in TEMPLATE_PREAMBLES:
         return key
     available = ", ".join(sorted(TEMPLATE_PREAMBLES.keys()))
-    raise SystemExit(f"Unknown template '{name}'. Available: {available} (or 1-4)")
+    raise SystemExit(f"Unknown template '{name}'. Available: {available} (or 1-5)")
 
 
 def write_notebook_preamble(path: Path, template_name: str):
@@ -369,9 +456,8 @@ def init_notebook(path: Path, title: str, short: str, url: str, template: str, s
     if structure not in ("lectures", "chapters"):
         raise SystemExit("Invalid --structure (use 'lectures' or 'chapters')")
 
-    # lecture-book is a thesis/book style; force chapter structure to avoid
-    # mixed semantics and to match the upstream masterthesis layout.
-    if template == "lecture-book":
+    # Book templates force chapter structure to avoid mixed semantics.
+    if is_book_template(template):
         structure = "chapters"
     path.mkdir(parents=True, exist_ok=True)
     (path / "figures").mkdir(exist_ok=True)
@@ -388,15 +474,21 @@ def init_notebook(path: Path, title: str, short: str, url: str, template: str, s
 
     master = path / "master.tex"
     if not master.exists():
-        if template == "lecture-book":
-            # Keep the "book" layout consistent with Gilles' masterthesis style.
+        if is_book_template(template):
             date = dt.datetime.now().strftime("%B %Y")
+            master_template = (
+                MASTER_TEMPLATE_BOOK_CHAPTERS
+                if template == "lecture-book"
+                else MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS
+            )
             master.write_text(
-                MASTER_TEMPLATE_BOOK_CHAPTERS.format(
+                master_template.format(
                     title=title,
                     author="Gabriel Nowaskie",
                     date=date,
+                    seriespage="",
                     frontmatter="",
+                    conclusion="",
                     backmatter="",
                 ),
                 encoding="utf-8",
@@ -416,6 +508,13 @@ def init_notebook(path: Path, title: str, short: str, url: str, template: str, s
             dst = path / fname
             if src.exists() and not dst.exists():
                 shutil.copy2(src, dst)
+        symbols = path / "symbols.tex"
+        if not symbols.exists():
+            symbols.write_text("% symbols.tex (optional)\n", encoding="utf-8")
+        bib = path / "bibliography.bib"
+        if not bib.exists():
+            bib.write_text("% bibliography.bib\n", encoding="utf-8")
+    elif template == "classic-book":
         symbols = path / "symbols.tex"
         if not symbols.exists():
             symbols.write_text("% symbols.tex (optional)\n", encoding="utf-8")
@@ -693,6 +792,7 @@ def cmd_list_templates(_args):
     print("2  lecture-light")
     print("3  lecture-dynamic")
     print("4  lecture-book")
+    print("5  classic-book")
 
 
 def build_parser():
@@ -704,11 +804,11 @@ def build_parser():
     a.add_argument("--title", required=True)
     a.add_argument("--short", required=True)
     a.add_argument("--url", default="https://")
-    a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for lecture-book (always chapters)")
+    a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
     a.add_argument(
         "--template",
         default="lecture-color",
-        help="Notebook template style (lecture-color|lecture-light|lecture-dynamic|lecture-book or 1-4)",
+        help="Notebook template style (lecture-color|lecture-light|lecture-dynamic|lecture-book|classic-book or 1-5)",
     )
     a.set_defaults(func=cmd_init_course)
 
@@ -720,11 +820,11 @@ def build_parser():
     a.add_argument("--title", required=True)
     a.add_argument("--short", required=True)
     a.add_argument("--url", default="https://")
-    a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for lecture-book (always chapters)")
+    a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
     a.add_argument(
         "--template",
         default="lecture-color",
-        help="Notebook template style (lecture-color|lecture-light|lecture-dynamic|lecture-book or 1-4)",
+        help="Notebook template style (lecture-color|lecture-light|lecture-dynamic|lecture-book|classic-book or 1-5)",
     )
     a.set_defaults(func=cmd_init_topic)
 
@@ -741,8 +841,9 @@ def build_parser():
     a = sub.add_parser("fix-master", help="Regenerate master.tex for the current notebook template")
     a.set_defaults(func=cmd_fix_master)
 
-    a = sub.add_parser("new-book-part", help="Create lecture-book front/back-matter files (copyright/preface/summary/symbols/conclusion)")
-    a.add_argument("part", help="copyright|preface|summary|symbols|conclusion")
+    book_parts = "|".join(BOOK_PART_TEMPLATES.keys())
+    a = sub.add_parser("new-book-part", help=f"Create book front/back-matter files ({book_parts})")
+    a.add_argument("part", help=book_parts)
     a.add_argument("--force", action="store_true", help="Overwrite if the file already exists")
     a.set_defaults(func=cmd_new_book_part)
 

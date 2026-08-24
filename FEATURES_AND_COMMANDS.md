@@ -45,11 +45,24 @@ Template defaults:
   - `lecture-light` (or `2`)
   - `lecture-dynamic` (or `3`)
   - `lecture-book` (or `4`)
+  - `classic-book` (or `5`)
 - file mapping:
   - `lecture-color` -> `templates/preambles/template1.tex`
   - `lecture-light` -> `templates/preambles/template2.tex`
   - `lecture-dynamic` -> `templates/preambles/template3.tex`
   - `lecture-book` -> `templates/preambles/template4.tex`
+  - `classic-book` -> `templates/preambles/template5.tex`
+- book parts:
+  - `notes new-book-part series`
+  - `notes new-book-part copyright`
+  - `notes new-book-part preface`
+  - `notes new-book-part summary`
+  - `notes new-book-part conclusion`
+  - `notes new-book-part answers`
+  - `notes new-book-part symbols`
+  - `notes new-book-part index`
+- `classic-book` order:
+  - half-title, optional series page, title page, copyright, preface, contents, chapters, bibliography, answers, list of symbols, index
 
 Figure management:
 

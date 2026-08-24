@@ -43,7 +43,18 @@ Add a lecture and compile:
 ./bin/notes compile --current
 ```
 
-Templates: multiple lecture-note templates (based on Gilles Castel’s layouts) plus `lecture-book` (tufte/masterthesis style). `lecture-book` always uses chapters (`chap_XX.tex` with `\chapter{...}`).
+Templates: multiple lecture-note templates (based on Gilles Castel’s layouts), `lecture-book` (tufte/masterthesis style), and `classic-book` (6x9 Addison-Wesley/Symon-style textbook). Book templates always use chapters (`chap_XX.tex` with `\chapter{...}`).
+
+For `classic-book`, optional book parts are included in this order when present:
+half-title, series page, title page, copyright, preface, contents, chapters, bibliography, answers to odd-numbered problems, list of symbols, index.
+
+```bash
+./bin/notes new-book-part copyright
+./bin/notes new-book-part preface
+./bin/notes new-book-part answers
+./bin/notes new-book-part index
+./bin/notes fix-master
+```
 
 In Neovim (leader is Space):
 - `Space+i` creates a new figure (writes a figure environment and opens Inkscape)
@@ -98,6 +109,7 @@ Current built-ins:
 - `lecture-light` (or `2`)
 - `lecture-dynamic` (or `3`)
 - `lecture-book` (or `4`)
+- `classic-book` (or `5`)
 
 You can use `--template <name>` with both `notes init-course` and `notes init-topic`.
 Each template maps to its own preamble file:
@@ -106,3 +118,15 @@ Each template maps to its own preamble file:
 - `lecture-light` -> `templates/preambles/template2.tex`
 - `lecture-dynamic` -> `templates/preambles/template3.tex`
 - `lecture-book` -> `templates/preambles/template4.tex`
+- `classic-book` -> `templates/preambles/template5.tex`
+
+Classic-book optional parts:
+
+- `notes new-book-part series`
+- `notes new-book-part copyright`
+- `notes new-book-part preface`
+- `notes new-book-part summary`
+- `notes new-book-part conclusion`
+- `notes new-book-part answers`
+- `notes new-book-part symbols`
+- `notes new-book-part index`
