@@ -45,6 +45,8 @@ Add a lecture and compile:
 
 Templates: multiple lecture-note templates (based on Gilles Castel’s layouts), `lecture-book` (tufte/masterthesis style), and `classic-book` (6x9 Addison-Wesley/Symon-style textbook). Book templates always use chapters (`chap_XX.tex` with `\chapter{...}`).
 
+The `classic-book` template vendors the custom `Symon Schoolbook` Type 1 family into each project. It is an optically lightened, renamed derivative of TeX Gyre Schola with unchanged TeX metrics, so line breaks and the Fourier New Century Schoolbook mathematics remain stable. Rebuild the bundled PFB and OTF files with `fontforge -script scripts/build_symon_schoolbook.py`.
+
 For `classic-book`, optional book parts are included in this order when present:
 half-title, series page, title page, copyright, dedication, preface, contents, chapters, bibliography, answers to odd-numbered problems, index of symbols, index.
 
@@ -61,13 +63,19 @@ notes init-course analysis \
   --affiliation "California Institute of Technology" \
   --edition "First Edition" \
   --printing "First Printing" \
+  --printing-date "January 1960" \
+  --preface-date "January, 1960" \
+  --preface-author "T. M. A." \
   --series "ADDISON-WESLEY SERIES IN MATHEMATICS" \
   --publisher "ADDISON-WESLEY PUBLISHING COMPANY, INC." \
   --publisher-location "Reading, Massachusetts, U.S.A." \
   --publisher-location "London, England" \
   --copyright-years "1957, 1960" \
   --catalog-card "60-5164" \
-  --publisher-mark triad \
+  --publisher-mark folio-star \
+  --printed-line "Printed in the United States of America" \
+  --copyright-notice "All rights reserved. This book, or parts thereof, may not be reproduced without permission." \
+  --catalog-label "Library of Congress Catalog Card No." \
   --running-heads math
 ```
 

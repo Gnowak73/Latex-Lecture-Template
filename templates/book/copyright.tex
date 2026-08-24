@@ -1,51 +1,58 @@
 % Copyright page (optional). Positions and measure follow Symon's second edition.
 
+\providecommand{\bookprintingdate}{}
+
 \clearpage
 \thispagestyle{empty}
 
 \begin{tikzpicture}[remember picture,overlay]
   \node[anchor=north,inner sep=0pt]
-    at ([xshift=0.08in,yshift=-1.10in]current page text area.north)
-    {\fontsize{10}{12}\selectfont\itshape
+    at ([xshift=0.08in,yshift=-1.06in]current page text area.north)
+    {\fontsize{9.7}{11.7}\selectfont\itshape
       Copyright \textcopyright\ \bookcopyrightyears};
 
   \node[anchor=north,inner sep=0pt,text width=3.55in,align=center]
-    at ([xshift=0.08in,yshift=-1.27in]current page text area.north)
+    at ([xshift=0.08in,yshift=-1.32in]current page text area.north)
     {\fontsize{9.2}{11}\selectfont\bfseries
       \textls[50]{\MakeUppercase{\bookpublisher}}};
 
   \draw[line width=0.55pt]
-    ([xshift=-0.60in,yshift=-1.49in]current page text area.north) --
-    ([xshift= 0.76in,yshift=-1.49in]current page text area.north);
+    ([xshift=-0.60in,yshift=-1.54in]current page text area.north) --
+    ([xshift= 0.76in,yshift=-1.54in]current page text area.north);
 
-  \node[anchor=north,inner sep=0pt]
-    at ([xshift=0.08in,yshift=-1.61in]current page text area.north)
-    {\fontsize{10}{12}\selectfont\itshape
-      Printed in the United States of America};
+  \ifstrempty{\bookprintedline}{}{
+    \node[anchor=north,inner sep=0pt]
+      at ([xshift=0.08in,yshift=-1.68in]current page text area.north)
+      {\fontsize{10}{12}\selectfont\itshape\bookprintedline};
+  }
 
-  \node[anchor=north,inner sep=0pt,text width=3.10in,align=center]
-    at ([xshift=0.08in,yshift=-1.88in]current page text area.north)
-    {\fontsize{7}{13}\selectfont\bfseries
-      \textls[35]{\MakeUppercase{All rights reserved. This book, or parts there-}}\\
-      \textls[35]{\MakeUppercase{of, may not be reproduced in any form with-}}\\[1.7pt]
-      \textls[35]{\MakeUppercase{out written permission of the publisher.}}};
+  \ifstrempty{\bookcopyrightnotice}{}{
+    \node[anchor=north,inner sep=0pt,text width=3.50in,align=center]
+      at ([xshift=0.08in,yshift=-1.97in]current page text area.north)
+      {\fontsize{7.2}{13}\selectfont\normalfont
+        \spaceskip=0.40em plus 0.12em minus 0.08em\relax
+        \MakeUppercase{\bookcopyrightnotice}};
+  }
 
-  \node[anchor=north,inner sep=0pt]
-    at ([xshift=0.08in,yshift=-2.47in]current page text area.north)
-    {\fontsize{10}{12}\selectfont\itshape
-      Library of Congress Catalog Card No.\ \ifstrempty{\bookcatalogcard}
-        {\rule{0.72in}{0.4pt}}{\bookcatalogcard}};
+  \ifstrempty{\bookcataloglabel}{}{
+    \node[anchor=north,inner sep=0pt]
+      at ([xshift=0.08in,yshift=-2.56in]current page text area.north)
+      {\fontsize{10}{12}\selectfont\itshape
+        \bookcataloglabel\ \ifstrempty{\bookcatalogcard}
+          {\rule{0.72in}{0.4pt}}{\bookcatalogcard}};
+  }
 
   \ifstrempty{\bookedition}{}{
     \node[anchor=north,inner sep=0pt]
-      at ([xshift=0.08in,yshift=-2.82in]current page text area.north)
+      at ([xshift=0.08in,yshift=-2.91in]current page text area.north)
       {\fontsize{10}{12}\selectfont\normalfont\bookedition};
   }
 
   \ifstrempty{\bookprinting}{}{
     \node[anchor=north,inner sep=0pt]
-      at ([xshift=0.08in,yshift=-3.05in]current page text area.north)
-      {\fontsize{10}{12}\selectfont\normalfont\bookprinting};
+      at ([xshift=0.08in,yshift=-3.14in]current page text area.north)
+      {\fontsize{10}{12}\selectfont\itshape\bookprinting%
+        \ifstrempty{\bookprintingdate}{}{\textemdash\,\bookprintingdate}};
   }
 \end{tikzpicture}
 

@@ -3,4 +3,17 @@
 
 % Write your preface here.
 
-\hfill \emph{Your Name, Month Year}
+\providecommand{\bookprefacedate}{}
+\providecommand{\bookprefaceauthor}{}
+
+\ifboolexpr{
+  not test {\ifstrempty{\bookprefacedate}}
+  or
+  not test {\ifstrempty{\bookprefaceauthor}}
+}{%
+  \par\vspace{0.65\baselineskip}
+  \noindent
+  \ifstrempty{\bookprefacedate}{}{\textit{\bookprefacedate}}%
+  \hfill
+  \ifstrempty{\bookprefaceauthor}{}{\textsc{\bookprefaceauthor}}%
+}{}

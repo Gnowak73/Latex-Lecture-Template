@@ -1,0 +1,17 @@
+Font family: Symon Schoolbook
+Source family: TeX Gyre Schola 2.005
+License: GUST Font License 1.0 / LPPL 1.3c or later
+
+This renamed derivative preserves the source family's metrics. Regular and
+italic outlines are lightened by 8 em units; bold and bold italic outlines
+are lightened by 12 em units. See scripts/build_symon_schoolbook.py.
+
+Generated font files:
+  symon-schoolbook-regular.pfb
+  symon-schoolbook-regular.otf
+  symon-schoolbook-italic.pfb
+  symon-schoolbook-italic.otf
+  symon-schoolbook-bold.pfb
+  symon-schoolbook-bold.otf
+  symon-schoolbook-bolditalic.pfb
+  symon-schoolbook-bolditalic.otf

@@ -5,12 +5,29 @@
 % New Century Schoolbook and its companion mathematics closely match the
 % sturdy Century face used in mid-century Addison-Wesley textbooks.
 \usepackage{fouriernc}
+% TeX Gyre Schola preserves the New Century Schoolbook text shapes, while
+% FourierNC supplies their matching mathematics.
+\usepackage[scale=0.93]{tgschola}
+% New classic-book projects vendor the optically lighter Symon Schoolbook
+% outlines while retaining Schola's mature TeX metrics and math companion.
+\ifdefined\pdfmapline
+  \IfFileExists{fonts/symon-schoolbook-map.tex}{%
+    \input{fonts/symon-schoolbook-map.tex}%
+  }{}
+\fi
+
+% The metal-set reference has slightly more air between words than digital
+% defaults. Preserve proportional glue at every selected font size.
+\AddToHook{selectfont}{%
+  \spaceskip=0.47em plus 0.16em minus 0.04em\relax
+}
+\spaceskip=0.47em plus 0.16em minus 0.04em\relax
 
 \usepackage[
     paperwidth=6in,
     paperheight=9in,
-    inner=0.48in,
-    outer=0.73in,
+    inner=15mm,
+    outer=20mm,
     top=0.86in,
     bottom=0.72in,
     headheight=12pt,
@@ -27,6 +44,9 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage[dvipsnames,svgnames]{xcolor}
+% Symon's display bold is both narrower and slightly shorter than the regular
+% CHAPTER line despite sharing its nominal point size.
+\newcommand{\symonbold}[1]{\scalebox{0.834}[0.92]{\bfseries #1}}
 \usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb}
 \usepackage{mathrsfs}
 \usepackage{cancel}
@@ -98,10 +118,10 @@
 \makeatother
 
 \renewcommand{\thechapter}{\arabic{chapter}}
-\renewcommand{\thesection}{\thechapter-\arabic{section}}
-\renewcommand{\thesubsection}{\thesection-\arabic{subsection}}
+\renewcommand{\thesection}{\thechapter\textendash\arabic{section}}
+\renewcommand{\thesubsection}{\thesection\textendash\arabic{subsection}}
 \numberwithin{equation}{chapter}
-\renewcommand{\theequation}{\thechapter-\arabic{equation}}
+\renewcommand{\theequation}{\thechapter\textendash\arabic{equation}}
 
 \titleformat{\chapter}[display]
   {\normalfont\centering}
@@ -111,16 +131,16 @@
 \titlespacing*{\chapter}{0pt}{0.30in}{1.7em}
 
 \titleformat{\section}[runin]
-  {\normalfont\bfseries}
-  {\thesection}
-  {0.5em}
-  {}
+  {\normalfont\fontsize{9.55}{11.2}\selectfont\bfseries}
+  {\textls[12]{\thesection}}
+  {0.55em}
+  {\textls[12]}
   [.]
-\titlespacing*{\section}{0pt}{1.0em plus 0.3em minus 0.1em}{0.5em}
+\titlespacing*{\section}{1.1em}{1.0em plus 0.3em minus 0.1em}{1.25em}
 
 \titleformat{\subsection}[runin]
-  {\normalfont\itshape}
-  {\thesubsection}
+  {\normalfont\fontsize{9.35}{11}\selectfont\itshape}
+  {\textls[8]{\thesubsection}}
   {0.5em}
   {}
   [.]
@@ -128,25 +148,28 @@
 
 \titlecontents{chapter}
   [0.45em]
-  {\vspace{0.30em}\scshape}
-  {Chapter \thecontentslabel.\hspace{1.65em}}
+  {\vspace{1.60em}\scshape\spaceskip=0.53em\relax}
+  {Chapter {\normalfont\thecontentslabel.}\hspace{0.93em}}
   {}
   {\normalfont\titlerule*[1.0pc]{.}\contentspage}
+  [\vspace{0.15em}]
 \titlecontents{section}
   [4.4em]
-  {}
+  {\normalfont\spaceskip=0pt}
   {\contentslabel{2.7em}}
   {}
   {\titlerule*[1.0pc]{.}\contentspage}
 
 \makeatletter
 \renewcommand{\@makechapterhead}[1]{%
-  \vspace*{0.18in}%
+  \vspace*{0.164in}%
   {\parindent \z@ \centering \normalfont
-    \textls[130]{\MakeUppercase{\chaptername}}\quad\thechapter\par
-    \vskip 1.0em
-    \large\bfseries\MakeUppercase{#1}\par\nobreak
-    \vskip 1.35em}}
+    \fontsize{10.7}{12.2}\selectfont
+    \textls[70]{\MakeUppercase{\chaptername}}\quad\thechapter\par
+    \vskip 1.15em
+    \fontsize{10.7}{12.2}\selectfont
+      \symonbold{\textls[25]{\MakeUppercase{#1}}}\par\nobreak
+    \vskip 1.19em}}
 \renewcommand{\@makeschapterhead}[1]{%
   \markboth{\MakeUppercase{#1}}{\MakeUppercase{#1}}%
   \vspace*{0.36in}%
@@ -174,16 +197,18 @@
 \fancypagestyle{symonmain}{%
   \fancyhf{}%
   \fancyhead[LE]{\thepage}%
-  \fancyhead[CE]{\small\MakeUppercase{\leftmark}}%
-  \fancyhead[RE]{\small
+  \fancyhead[CE]{\fontsize{7.4}{8.5}\selectfont\MakeUppercase{\leftmark}}%
+  \fancyhead[RE]{%
     \ifdefstring{\symonrunningheadmode}{math}
-      {\symonmathversomark}
-      {[CHAP.\ \thechapter}}%
-  \fancyhead[LO]{\small
+      {\fontsize{8.2}{9.2}\selectfont\symonmathversomark}
+      {{\fontsize{10.2}{10.8}\selectfont[}%
+       {\fontsize{7.4}{8.5}\selectfont CHAP.}\ %
+       {\fontsize{10.2}{10.8}\selectfont\thechapter}}}%
+  \fancyhead[LO]{%
     \ifdefstring{\symonrunningheadmode}{math}
-      {\symonmathrectomark}
-      {\thesection]}}%
-  \fancyhead[CO]{\small
+      {\fontsize{8.2}{9.2}\selectfont\symonmathrectomark}
+      {\fontsize{8.2}{9.2}\selectfont\thesection]}}%
+  \fancyhead[CO]{\fontsize{7.4}{8.5}\selectfont
     \ifdefstring{\symonrunningheadmode}{math}
       {\MakeUppercase{\leftmark}}
       {\MakeUppercase{\rightmark}}}%
@@ -195,7 +220,7 @@
 \fancypagestyle{symonfront}{%
   \fancyhf{}%
   \fancyhead[LE]{\thepage}%
-  \fancyhead[CE,CO]{\small\MakeUppercase{\leftmark}}%
+  \fancyhead[CE,CO]{\fontsize{7.4}{8.5}\selectfont\MakeUppercase{\leftmark}}%
   \fancyhead[RO]{\thepage}%
   \renewcommand{\headrulewidth}{0pt}%
   \renewcommand{\footrulewidth}{0pt}%
@@ -204,7 +229,7 @@
 \fancypagestyle{symonback}{%
   \fancyhf{}%
   \fancyhead[LE]{\thepage}%
-  \fancyhead[CE,CO]{\small\MakeUppercase{\leftmark}}%
+  \fancyhead[CE,CO]{\fontsize{7.4}{8.5}\selectfont\MakeUppercase{\leftmark}}%
   \fancyhead[RO]{\thepage}%
   \renewcommand{\headrulewidth}{0pt}%
   \renewcommand{\footrulewidth}{0pt}%
@@ -214,7 +239,7 @@
 
 \fancypagestyle{plain}{%
   \fancyhf{}%
-  \fancyfoot[C]{\thepage}%
+  \fancyfoot[C]{\raisebox{0.41in}[0pt][0pt]{\thepage}}%
   \renewcommand{\headrulewidth}{0pt}%
   \renewcommand{\footrulewidth}{0pt}%
 }

@@ -20,6 +20,7 @@ SNIPPETS_TEMPLATE = ROOT / "templates" / "tex.snippets"
 FIGURE_TEMPLATE = ROOT / "templates" / "template.svg"
 PREAMBLES_DIR = ROOT / "templates" / "preambles"
 BOOK_TEMPLATE_DIR = ROOT / "templates" / "book"
+CLASSIC_FONT_DIR = ROOT / "templates" / "fonts" / "symon-schoolbook"
 BOOK_PART_TEMPLATES: dict[str, Path] = {
     "series": BOOK_TEMPLATE_DIR / "series.tex",
     "copyright": BOOK_TEMPLATE_DIR / "copyright.tex",
@@ -109,6 +110,9 @@ MASTER_TEMPLATE_BOOK_CHAPTERS = """\\documentclass[working]{{tuftebook}}
 MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openright]{{book}}
 
 \\input{{preamble.tex}}
+% Generated title leaves use the text-area anchors provided by this package.
+% Keep this here as well as in template5 so older project preambles still work.
+\\usepackage{{tikzpagenodes}}
 \\input{{symbols.tex}}
 \\title{{{title}}}
 \\author{{{author}}}
@@ -116,10 +120,16 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openrigh
 \\newcommand{{\\bookaffiliation}}{{{affiliation}}}
 \\newcommand{{\\bookedition}}{{{edition}}}
 \\newcommand{{\\bookprinting}}{{{printing}}}
+\\newcommand{{\\bookprintingdate}}{{{printing_date}}}
+\\newcommand{{\\bookprefacedate}}{{{preface_date}}}
+\\newcommand{{\\bookprefaceauthor}}{{{preface_author}}}
 \\newcommand{{\\bookpublisherlocations}}{{{publisher_locations}}}
 \\newcommand{{\\bookcopyrightyears}}{{{copyright_years}}}
 \\newcommand{{\\bookcatalogcard}}{{{catalog_card}}}
 \\newcommand{{\\bookpublishermark}}{{{publisher_mark}}}
+\\newcommand{{\\bookprintedline}}{{{printed_line}}}
+\\newcommand{{\\bookcopyrightnotice}}{{{copyright_notice}}}
+\\newcommand{{\\bookcataloglabel}}{{{catalog_label}}}
 \\symonrunningheads{{{running_heads}}}
 \\begin{{document}}
     \\frontmatter
@@ -129,7 +139,8 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openrigh
     \\begin{{tikzpicture}}[remember picture,overlay]
         \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]
             at ([yshift=-1.36in]current page text area.north)
-            {{\\fontsize{{38.5}}{{42}}\\selectfont\\textls[75]{{\\MakeUppercase{{{title}}}}}}};
+            {{\\fontsize{{34.5}}{{38}}\\selectfont
+              \\textls[110]{{\\MakeUppercase{{{title}}}}}}};
     \\end{{tikzpicture}}
     \\null
     \\clearpage
@@ -139,46 +150,52 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openrigh
     \\begin{{tikzpicture}}[remember picture,overlay]
             \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]
                 at ([yshift=-0.68in]current page text area.north)
-                {{\\fontsize{{38.5}}{{42}}\\selectfont\\textls[75]{{\\MakeUppercase{{{title}}}}}}};
+                {{\\fontsize{{34.5}}{{38}}\\selectfont
+                  \\textls[110]{{\\MakeUppercase{{{title}}}}}}};
             \\draw[line width=0.6pt]
-                ([xshift=-2.03in,yshift=-1.24in]current page text area.north) --
-                ([xshift= 2.03in,yshift=-1.24in]current page text area.north);
+                ([xshift=-2.03in,yshift=-1.32in]current page text area.north) --
+                ([xshift= 2.03in,yshift=-1.32in]current page text area.north);
             \\node[anchor=north,inner sep=0pt]
-                at ([yshift=-1.85in]current page text area.north)
-                {{\\fontsize{{10}}{{12}}\\selectfont\\itshape by}};
+                at ([yshift=-1.78in]current page text area.north)
+                {{\\fontsize{{9.5}}{{11}}\\selectfont\\itshape by}};
             \\node[anchor=north,inner sep=0pt]
-                at ([yshift=-2.10in]current page text area.north)
-                {{\\fontsize{{12.8}}{{15}}\\selectfont\\normalfont\\textls[130]{{\\MakeUppercase{{{author}}}}}}};
+                at ([yshift=-2.04in]current page text area.north)
+                {{\\fontsize{{10.7}}{{12.8}}\\selectfont\\normalfont\\textls[140]{{\\MakeUppercase{{{author}}}}}}};
             \\ifstrempty{{\\bookaffiliation}}{{}}{{
                 \\node[anchor=north,inner sep=0pt]
-                    at ([yshift=-2.42in]current page text area.north)
-                    {{\\fontsize{{10}}{{12}}\\selectfont\\itshape\\bookaffiliation}};
+                    at ([yshift=-2.32in]current page text area.north)
+                    {{\\fontsize{{9.6}}{{11.5}}\\selectfont\\itshape\\bookaffiliation}};
             }}
             \\ifstrempty{{\\bookedition}}{{}}{{
                 \\node[anchor=north,inner sep=0pt]
-                    at ([yshift=-4.39in]current page text area.north)
-                    {{\\fontsize{{8.7}}{{11}}\\selectfont\\normalfont\\MakeUppercase{{\\bookedition}}}};
+                    at ([yshift=-4.29in]current page text area.north)
+                    {{\\fontsize{{7.5}}{{9.5}}\\selectfont\\normalfont\\MakeUppercase{{\\bookedition}}}};
             }}
-            \\ifdefstring{{\\bookpublishermark}}{{triad}}{{
+            \\ifdefstring{{\\bookpublishermark}}{{none}}{{}}{{
                 \\begin{{scope}}[
-                    shift={{([yshift=-5.75in]current page text area.north)}}
+                    shift={{([yshift=-5.64in]current page text area.north)}}
                 ]
-                    \\fill (0,0) -- (-5.7pt,-10pt) -- (5.7pt,-10pt) -- cycle;
-                    \\fill (-11.5pt,-11pt) -- (-0.5pt,-11pt) --
-                          (-6pt,-21pt) -- cycle;
-                    \\fill (0.5pt,-11pt) -- (11.5pt,-11pt) --
-                          (6pt,-21pt) -- cycle;
+                    % Original press mark: a guiding star over an open folio.
+                    \\fill (0,7pt) -- (2pt,2pt) -- (7pt,0) --
+                          (2pt,-2pt) -- (0,-7pt) -- (-2pt,-2pt) --
+                          (-7pt,0) -- (-2pt,2pt) -- cycle;
+                    \\draw[line width=0.90pt,line cap=round,line join=round]
+                          (-16pt,-8pt) .. controls (-10pt,-6pt) and (-5pt,-7pt) ..
+                          (0,-12pt) .. controls (5pt,-7pt) and (10pt,-6pt) ..
+                          (16pt,-8pt);
                 \\end{{scope}}
-            }}{{}}
+            }}
             \\ifstrempty{{\\bookpublisher}}{{}}{{
-                \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]
-                    at ([yshift=-6.64in]current page text area.north)
-                    {{\\fontsize{{12}}{{14}}\\selectfont\\bfseries\\textls[110]{{\\MakeUppercase{{\\bookpublisher}}}}}};
+                \\node[anchor=north,inner sep=0pt,text width=5.20in,align=center]
+                    at ([yshift=-6.50in]current page text area.north)
+                    {{\\fontsize{{10.2}}{{12}}\\selectfont\\normalfont
+                      \\textls[85]{{\\MakeUppercase{{\\bookpublisher}}}}}};
             }}
             \\ifstrempty{{\\bookpublisherlocations}}{{}}{{
-                \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]
-                    at ([yshift=-6.88in]current page text area.north)
-                    {{\\fontsize{{9}}{{12}}\\selectfont\\bfseries\\textls[30]{{\\MakeUppercase{{\\bookpublisherlocations}}}}}};
+                \\node[anchor=north,inner sep=0pt,text width=5.20in,align=center]
+                    at ([yshift=-6.75in]current page text area.north)
+                    {{\\fontsize{{7.7}}{{11.5}}\\selectfont\\normalfont
+                      \\textls[45]{{\\MakeUppercase{{\\bookpublisherlocations}}}}}};
             }}
     \\end{{tikzpicture}}
     \\null
@@ -206,6 +223,17 @@ def is_book_template(template: str) -> bool:
     return template in {"lecture-book", "classic-book"}
 
 
+def vendor_classic_book_fonts(path: Path) -> None:
+    """Copy the project-local Symon Schoolbook bundle into a classic book."""
+    if not CLASSIC_FONT_DIR.exists():
+        return
+    destination = path / "fonts"
+    destination.mkdir(exist_ok=True)
+    for source in CLASSIC_FONT_DIR.iterdir():
+        if source.is_file():
+            shutil.copy2(source, destination / source.name)
+
+
 def symbols_define_list(path: Path) -> bool:
     if not path.exists():
         return False
@@ -225,12 +253,22 @@ def rewrite_master_for_current_notebook(path: Path):
     affiliation = info.get("affiliation", "").strip()
     edition = info.get("edition", "").strip()
     printing = info.get("printing", "").strip()
-    publisher_locations = info.get("publisher_locations", "").strip().replace("|", "\\\\")
+    printing_date = info.get("printing_date", "").strip()
+    preface_date = info.get("preface_date", "").strip()
+    preface_author = info.get("preface_author", "").strip() or author
+    publisher_locations = info.get("publisher_locations", "").strip().replace(
+        "|", r"\enspace\textperiodcentered\enspace{}"
+    )
     copyright_years = info.get("copyright_years", "").strip() or "\\the\\year"
     catalog_card = info.get("catalog_card", "").strip()
     publisher_mark = info.get("publisher_mark", "none").strip().lower()
-    if publisher_mark not in {"none", "triad"}:
+    if publisher_mark == "triad":
+        publisher_mark = "folio-star"
+    if publisher_mark not in {"none", "folio-star"}:
         publisher_mark = "none"
+    printed_line = info.get("printed_line", "").strip()
+    copyright_notice = info.get("copyright_notice", "").strip().replace("|", "\\\\")
+    catalog_label = info.get("catalog_label", "").strip()
     running_heads = info.get("running_heads", "symon").strip().lower()
     if running_heads not in {"symon", "math"}:
         running_heads = "symon"
@@ -308,10 +346,16 @@ def rewrite_master_for_current_notebook(path: Path):
                 affiliation=affiliation,
                 edition=edition,
                 printing=printing,
+                printing_date=printing_date,
+                preface_date=preface_date,
+                preface_author=preface_author,
                 publisher_locations=publisher_locations,
                 copyright_years=copyright_years,
                 catalog_card=catalog_card,
                 publisher_mark=publisher_mark,
+                printed_line=printed_line,
+                copyright_notice=copyright_notice,
+                catalog_label=catalog_label,
                 date=date,
                 running_heads=running_heads,
                 seriespage=seriespage,
@@ -344,6 +388,8 @@ def cmd_fix_master(_args):
             dst = path / fname
             if src.exists():
                 shutil.copy2(src, dst)
+    elif template == "classic-book":
+        vendor_classic_book_fonts(path)
     rewrite_master_for_current_notebook(path)
     print(f"Rewrote master.tex for: {path.name}")
 
@@ -556,10 +602,16 @@ def init_notebook(
     affiliation: str = "",
     edition: str = "",
     printing: str = "",
+    printing_date: str = "",
+    preface_date: str = "",
+    preface_author: str = "",
     publisher_locations: str = "",
     copyright_years: str = "",
     catalog_card: str = "",
     publisher_mark: str = "none",
+    printed_line: str = "",
+    copyright_notice: str = "",
+    catalog_label: str = "",
 ):
     template = normalize_template_name(template)
     structure = structure.strip().lower()
@@ -572,6 +624,9 @@ def init_notebook(
     # Book templates force chapter structure to avoid mixed semantics.
     if is_book_template(template):
         structure = "chapters"
+    if template == "classic-book":
+        preface_date = preface_date.strip() or dt.datetime.now().strftime("%B, %Y")
+        preface_author = preface_author.strip() or author
     path.mkdir(parents=True, exist_ok=True)
     (path / "figures").mkdir(exist_ok=True)
     (path / "UltiSnips").mkdir(exist_ok=True)
@@ -586,10 +641,16 @@ def init_notebook(
         f"affiliation: '{affiliation}'\n"
         f"edition: '{edition}'\n"
         f"printing: '{printing}'\n"
+        f"printing_date: '{printing_date}'\n"
+        f"preface_date: '{preface_date}'\n"
+        f"preface_author: '{preface_author}'\n"
         f"publisher_locations: '{publisher_locations}'\n"
         f"copyright_years: '{copyright_years}'\n"
         f"catalog_card: '{catalog_card}'\n"
         f"publisher_mark: '{publisher_mark}'\n"
+        f"printed_line: '{printed_line}'\n"
+        f"copyright_notice: '{copyright_notice}'\n"
+        f"catalog_label: '{catalog_label}'\n"
         f"running_heads: '{running_heads}'\n"
         f"template: '{template}'\n"
         f"structure: '{structure}'\n"
@@ -629,10 +690,18 @@ def init_notebook(
                     affiliation=affiliation,
                     edition=edition,
                     printing=printing,
-                    publisher_locations=publisher_locations.replace("|", "\\\\"),
+                    printing_date=printing_date,
+                    preface_date=preface_date,
+                    preface_author=preface_author,
+                    publisher_locations=publisher_locations.replace(
+                        "|", r"\enspace\textperiodcentered\enspace{}"
+                    ),
                     copyright_years=copyright_years or "\\the\\year",
                     catalog_card=catalog_card,
                     publisher_mark=publisher_mark,
+                    printed_line=printed_line,
+                    copyright_notice=copyright_notice.replace("|", "\\\\"),
+                    catalog_label=catalog_label,
                     date=date,
                     running_heads=running_heads,
                     seriespage=initial_seriespage,
@@ -669,6 +738,7 @@ def init_notebook(
         if not bib.exists():
             bib.write_text("% bibliography.bib\n", encoding="utf-8")
     elif template == "classic-book":
+        vendor_classic_book_fonts(path)
         symbols = path / "symbols.tex"
         if not symbols.exists():
             symbols.write_text("% symbols.tex (optional)\n", encoding="utf-8")
@@ -691,8 +761,10 @@ def cmd_init_course(args):
         path, args.title, args.short, args.url, args.template, args.structure,
         args.author, args.series, args.publisher, args.running_heads,
         args.affiliation, args.edition, args.printing,
+        args.printing_date, args.preface_date, args.preface_author,
         "|".join(args.publisher_locations), args.copyright_years, args.catalog_card,
-        args.publisher_mark,
+        args.publisher_mark, args.printed_line, args.copyright_notice,
+        args.catalog_label,
     )
     print(f"Initialized course at {path}")
 
@@ -711,8 +783,10 @@ def cmd_init_topic(args):
         path, args.title, args.short, args.url, args.template, args.structure,
         args.author, args.series, args.publisher, args.running_heads,
         args.affiliation, args.edition, args.printing,
+        args.printing_date, args.preface_date, args.preface_author,
         "|".join(args.publisher_locations), args.copyright_years, args.catalog_card,
-        args.publisher_mark,
+        args.publisher_mark, args.printed_line, args.copyright_notice,
+        args.catalog_label,
     )
     print(f"Initialized topic at {path}")
 
@@ -976,10 +1050,16 @@ def build_parser():
     a.add_argument("--affiliation", default="", help="Optional institution shown below the author")
     a.add_argument("--edition", default="", help="Optional edition line, for example 'Second Edition'")
     a.add_argument("--printing", default="", help="Optional printing line, for example 'Third Printing'")
-    a.add_argument("--publisher-location", dest="publisher_locations", action="append", default=[], help="Publisher location line; repeat for multiple lines")
+    a.add_argument("--printing-date", default="", help="Optional date shown after the printing line")
+    a.add_argument("--preface-date", default="", help="Preface closing date; defaults to the current month and year")
+    a.add_argument("--preface-author", default="", help="Preface closing name or initials; defaults to the author")
+    a.add_argument("--publisher-location", dest="publisher_locations", action="append", default=[], help="Publisher location; repeat to separate locations with centered dots")
     a.add_argument("--copyright-years", default="", help="Copyright year or years; defaults to the current year")
     a.add_argument("--catalog-card", default="", help="Optional Library of Congress catalog card number")
-    a.add_argument("--publisher-mark", choices=["none", "triad"], default="none", help="Optional title-page publisher mark")
+    a.add_argument("--publisher-mark", choices=["none", "folio-star"], default="none", help="Optional original star-and-folio publisher mark")
+    a.add_argument("--printed-line", default="", help="Optional copyright-page printing/location line")
+    a.add_argument("--copyright-notice", default="", help="Optional rights notice; use | for explicit line breaks")
+    a.add_argument("--catalog-label", default="", help="Optional label preceding the catalog number")
     a.add_argument("--running-heads", choices=["symon", "math"], default="symon", help="Classic-book running heads: Symon chapter/section or Apostol theorem tracking")
     a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
     a.add_argument(
@@ -1003,10 +1083,16 @@ def build_parser():
     a.add_argument("--affiliation", default="", help="Optional institution shown below the author")
     a.add_argument("--edition", default="", help="Optional edition line, for example 'Second Edition'")
     a.add_argument("--printing", default="", help="Optional printing line, for example 'Third Printing'")
-    a.add_argument("--publisher-location", dest="publisher_locations", action="append", default=[], help="Publisher location line; repeat for multiple lines")
+    a.add_argument("--printing-date", default="", help="Optional date shown after the printing line")
+    a.add_argument("--preface-date", default="", help="Preface closing date; defaults to the current month and year")
+    a.add_argument("--preface-author", default="", help="Preface closing name or initials; defaults to the author")
+    a.add_argument("--publisher-location", dest="publisher_locations", action="append", default=[], help="Publisher location; repeat to separate locations with centered dots")
     a.add_argument("--copyright-years", default="", help="Copyright year or years; defaults to the current year")
     a.add_argument("--catalog-card", default="", help="Optional Library of Congress catalog card number")
-    a.add_argument("--publisher-mark", choices=["none", "triad"], default="none", help="Optional title-page publisher mark")
+    a.add_argument("--publisher-mark", choices=["none", "folio-star"], default="none", help="Optional original star-and-folio publisher mark")
+    a.add_argument("--printed-line", default="", help="Optional copyright-page printing/location line")
+    a.add_argument("--copyright-notice", default="", help="Optional rights notice; use | for explicit line breaks")
+    a.add_argument("--catalog-label", default="", help="Optional label preceding the catalog number")
     a.add_argument("--running-heads", choices=["symon", "math"], default="symon", help="Classic-book running heads: Symon chapter/section or Apostol theorem tracking")
     a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
     a.add_argument(
