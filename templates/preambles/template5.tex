@@ -2,7 +2,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{textcomp}
 \usepackage{microtype}
-\usepackage{newtxtext}
+\usepackage{tgtermes}
 
 \usepackage[
     paperwidth=6in,
@@ -75,14 +75,14 @@
 \renewcommand{\theequation}{\thechapter-\arabic{equation}}
 
 \titleformat{\chapter}[display]
-  {\normalfont\bfseries\centering}
+  {\normalfont\fontseries{bx}\selectfont\centering}
   {\MakeUppercase{\chaptername} \thechapter}
   {0.8em}
-  {\large\bfseries\MakeUppercase}
+  {\large\fontseries{bx}\selectfont\MakeUppercase}
 \titlespacing*{\chapter}{0pt}{0.10\textheight}{2.0em}
 
 \titleformat{\section}[runin]
-  {\normalfont\bfseries}
+  {\normalfont\fontseries{bx}\selectfont}
   {\thesection}
   {0.5em}
   {}
@@ -113,15 +113,15 @@
 \makeatletter
 \renewcommand{\@makechapterhead}[1]{%
   \vspace*{0.08\textheight}%
-  {\parindent \z@ \centering \normalfont\bfseries
+  {\parindent \z@ \centering \normalfont\fontseries{bx}\selectfont
     \MakeUppercase{\chaptername}\space\thechapter\par
     \vskip 1.0em
-    \large\bfseries\MakeUppercase{#1}\par\nobreak
+    \large\fontseries{bx}\selectfont\MakeUppercase{#1}\par\nobreak
     \vskip 2.0em}}
 \renewcommand{\@makeschapterhead}[1]{%
   \vspace*{0.08\textheight}%
-  {\parindent \z@ \centering \normalfont\bfseries
-    \large\bfseries\MakeUppercase{#1}\par\nobreak
+  {\parindent \z@ \centering \normalfont\fontseries{bx}\selectfont
+    \large\fontseries{bx}\selectfont\MakeUppercase{#1}\par\nobreak
     \vskip 2.0em}}
 \makeatother
 
