@@ -5,7 +5,11 @@
 \def\symbolentry#1#2#3{\item[#2] #3}
 
 \newcommand{\listofsymbols}{
-    \chapter*{List of symbols}
+    \symontitleleaf{Index of Symbols}
+    \addcontentsline{toc}{chapter}{List of Symbols}
+    \markboth{INDEX OF SYMBOLS}{INDEX OF SYMBOLS}
+    \begin{center}\large INDEX OF SYMBOLS\end{center}
+    \vspace{1.0em}
     \begin{abbrv}
         \item[]\vspace{-\baselineskip}
         % \symbolentry{A}{$A$}{Description}

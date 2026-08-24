@@ -106,21 +106,23 @@ MASTER_TEMPLATE_BOOK_CHAPTERS = """\\documentclass[working]{{tuftebook}}
 \\end{{document}}
 """
 
-MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openany]{{book}}
+MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openright]{{book}}
 
 \\input{{preamble.tex}}
 \\input{{symbols.tex}}
 \\title{{{title}}}
 \\author{{{author}}}
-\\date{{{date}}}
+\\newcommand{{\\bookpublisher}}{{{publisher}}}
+\\symonrunningheads{{{running_heads}}}
 \\begin{{document}}
     \\frontmatter
+    \\pagestyle{{symonfront}}
     \\hypersetup{{pageanchor=false}}
     \\begin{{titlepage}}
         \\thispagestyle{{empty}}
-        \\vspace*{{0.22\\textheight}}
+        \\vspace*{{0.18\\textheight}}
         \\begin{{center}}
-            {{\\Large\\MakeUppercase{{{title}}}\\par}}
+            {{\\LARGE\\MakeUppercase{{{title}}}\\par}}
         \\end{{center}}
         \\vfill
     \\end{{titlepage}}
@@ -128,17 +130,17 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openany]
 {seriespage}
     \\begin{{titlepage}}
         \\thispagestyle{{empty}}
-        \\vspace*{{0.16\\textheight}}
+        \\vspace*{{0.07\\textheight}}
         \\begin{{center}}
-            {{\\Large\\MakeUppercase{{{title}}}\\par}}
-            \\vspace{{2.4em}}
-            {{\\normalsize BY\\par}}
-            \\vspace{{1.2em}}
-            {{\\large\\MakeUppercase{{{author}}}\\par}}
+            {{\\Huge\\MakeUppercase{{{title}}}\\par}}
+            \\vspace{{0.6em}}
+            \\rule{{\\textwidth}}{{0.6pt}}
+            \\vspace{{2.0em}}
+            {{\\itshape by\\par}}
+            \\vspace{{1.0em}}
+            {{\\large\\bfseries\\MakeUppercase{{{author}}}\\par}}
             \\vfill
 {publisherline}
-            \\vspace{{0.5em}}
-            {{\\normalsize {date}\\par}}
         \\end{{center}}
     \\end{{titlepage}}
     \\hypersetup{{pageanchor=true}}
@@ -146,11 +148,15 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openany]
     \\tableofcontents
     \\cleardoublepage
     \\mainmatter
+    \\pagestyle{{symonmain}}
     % start chapters
     % end chapters
     \\backmatter
+    \\pagestyle{{symonback}}
 {conclusion}
-    \\printbibliography
+    \\symontitleleaf{{Bibliography}}
+    \\addcontentsline{{toc}}{{chapter}}{{Bibliography}}
+    \\printbibliography[heading=symonbibliography]
 {backmatter}
 \\end{{document}}
 """
@@ -176,6 +182,9 @@ def rewrite_master_for_current_notebook(path: Path):
     author = info.get("author", "Gabriel Nowaskie")
     series = info.get("series", "").strip()
     publisher = info.get("publisher", "").strip()
+    running_heads = info.get("running_heads", "symon").strip().lower()
+    if running_heads not in {"symon", "math"}:
+        running_heads = "symon"
     template = normalize_template_name(info.get("template", "lecture-color"))
     structure = notebook_structure(path)
     existing_numbers = [parse_entry_number(p.stem) for p in lecture_files(path)]
@@ -195,9 +204,11 @@ def rewrite_master_for_current_notebook(path: Path):
                     "\n"
                     "    \\begin{titlepage}\n"
                     "        \\thispagestyle{empty}\n"
-                    "        \\vspace*{0.32\\textheight}\n"
+                    "        \\vspace*{0.18\\textheight}\n"
                     "        \\begin{center}\n"
-                    f"            {{\\normalsize\\MakeUppercase{{{series}}}\\par}}\n"
+                    "            {\\normalsize This book is in the\\par}\n"
+                    "            \\vspace{0.8em}\n"
+                    f"            {{\\large\\MakeUppercase{{{series}}}\\par}}\n"
                     "        \\end{center}\n"
                     "        \\vfill\n"
                     "    \\end{titlepage}\n"
@@ -243,7 +254,9 @@ def rewrite_master_for_current_notebook(path: Path):
             master_template.format(
                 title=title,
                 author=author,
+                publisher=publisher,
                 date=date,
+                running_heads=running_heads,
                 seriespage=seriespage,
                 publisherline=publisherline,
                 frontmatter=frontmatter,
@@ -482,9 +495,13 @@ def init_notebook(
     author: str = "Gabriel Nowaskie",
     series: str = "",
     publisher: str = "",
+    running_heads: str = "symon",
 ):
     template = normalize_template_name(template)
     structure = structure.strip().lower()
+    running_heads = running_heads.strip().lower()
+    if running_heads not in {"symon", "math"}:
+        raise SystemExit("Invalid --running-heads (use 'symon' or 'math')")
     if structure not in ("lectures", "chapters"):
         raise SystemExit("Invalid --structure (use 'lectures' or 'chapters')")
 
@@ -502,6 +519,7 @@ def init_notebook(
         f"author: '{author}'\n"
         f"series: '{series}'\n"
         f"publisher: '{publisher}'\n"
+        f"running_heads: '{running_heads}'\n"
         f"template: '{template}'\n"
         f"structure: '{structure}'\n"
     )
@@ -511,6 +529,21 @@ def init_notebook(
     if not master.exists():
         if is_book_template(template):
             date = dt.datetime.now().strftime("%B %Y")
+            initial_seriespage = ""
+            if template == "classic-book" and series:
+                initial_seriespage = (
+                    "\n"
+                    "    \\begin{titlepage}\n"
+                    "        \\thispagestyle{empty}\n"
+                    "        \\vspace*{0.18\\textheight}\n"
+                    "        \\begin{center}\n"
+                    "            {\\normalsize This book is in the\\par}\n"
+                    "            \\vspace{0.8em}\n"
+                    f"            {{\\large\\MakeUppercase{{{series}}}\\par}}\n"
+                    "        \\end{center}\n"
+                    "        \\vfill\n"
+                    "    \\end{titlepage}\n"
+                )
             master_template = (
                 MASTER_TEMPLATE_BOOK_CHAPTERS
                 if template == "lecture-book"
@@ -520,8 +553,10 @@ def init_notebook(
                 master_template.format(
                     title=title,
                     author=author,
+                    publisher=publisher,
                     date=date,
-                    seriespage="",
+                    running_heads=running_heads,
+                    seriespage=initial_seriespage,
                     publisherline=(
                         f"            {{\\normalsize\\MakeUppercase{{{publisher}}}\\par}}\n"
                         if publisher
@@ -573,7 +608,7 @@ def init_notebook(
 
 def cmd_init_course(args):
     path = notebook_dir("course", args.name)
-    init_notebook(path, args.title, args.short, args.url, args.template, args.structure, args.author, args.series, args.publisher)
+    init_notebook(path, args.title, args.short, args.url, args.template, args.structure, args.author, args.series, args.publisher, args.running_heads)
     print(f"Initialized course at {path}")
 
 
@@ -587,7 +622,7 @@ def cmd_list_courses(_args):
 
 def cmd_init_topic(args):
     path = notebook_dir("topic", args.name)
-    init_notebook(path, args.title, args.short, args.url, args.template, args.structure, args.author, args.series, args.publisher)
+    init_notebook(path, args.title, args.short, args.url, args.template, args.structure, args.author, args.series, args.publisher, args.running_heads)
     print(f"Initialized topic at {path}")
 
 
@@ -847,6 +882,7 @@ def build_parser():
     a.add_argument("--author", default="Gabriel Nowaskie")
     a.add_argument("--series", default="", help="Optional classic-book series name")
     a.add_argument("--publisher", default="", help="Optional classic-book publisher/imprint line")
+    a.add_argument("--running-heads", choices=["symon", "math"], default="symon", help="Classic-book running heads: Symon chapter/section or Apostol theorem tracking")
     a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
     a.add_argument(
         "--template",
@@ -866,6 +902,7 @@ def build_parser():
     a.add_argument("--author", default="Gabriel Nowaskie")
     a.add_argument("--series", default="", help="Optional classic-book series name")
     a.add_argument("--publisher", default="", help="Optional classic-book publisher/imprint line")
+    a.add_argument("--running-heads", choices=["symon", "math"], default="symon", help="Classic-book running heads: Symon chapter/section or Apostol theorem tracking")
     a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
     a.add_argument(
         "--template",

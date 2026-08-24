@@ -46,7 +46,23 @@ Add a lecture and compile:
 Templates: multiple lecture-note templates (based on Gilles Castel’s layouts), `lecture-book` (tufte/masterthesis style), and `classic-book` (6x9 Addison-Wesley/Symon-style textbook). Book templates always use chapters (`chap_XX.tex` with `\chapter{...}`).
 
 For `classic-book`, optional book parts are included in this order when present:
-half-title, series page, title page, copyright, preface, contents, chapters, bibliography, answers to odd-numbered problems, list of symbols, index.
+half-title, series page, title page, copyright, dedication, preface, contents, chapters, bibliography, answers to odd-numbered problems, index of symbols, index.
+
+Choose the running-head scheme when creating the book. `symon` uses chapter and
+section heads; `math` replaces their inner markers with the current numbered
+statement (`THM.`, `DEF.`, `LEM.`, and so on).
+
+```bash
+notes init-course analysis \
+  --title "Mathematical Analysis" \
+  --short ANALYSIS \
+  --template classic-book \
+  --running-heads math
+```
+
+The same setting can be changed later in `info.yaml` with
+`running_heads: 'symon'` or `running_heads: 'math'`, followed by
+`notes fix-master`.
 
 ```bash
 ./bin/notes new-book-part copyright
@@ -124,6 +140,7 @@ Classic-book optional parts:
 
 - `notes new-book-part series`
 - `notes new-book-part copyright`
+- `notes new-book-part dedication`
 - `notes new-book-part preface`
 - `notes new-book-part summary`
 - `notes new-book-part conclusion`

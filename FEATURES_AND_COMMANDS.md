@@ -11,8 +11,8 @@ This file is command-only reference. Setup/workflow context is in `README.md`.
 
 Notebook creation:
 
-- `notes init-course <name> --title "<title>" --short <code> [--url <url>] [--template <name>]`
-- `notes init-topic <name> --title "<title>" --short <code> [--url <url>] [--template <name>]`
+- `notes init-course <name> --title "<title>" --short <code> [--url <url>] [--template <name>] [--running-heads symon|math]`
+- `notes init-topic <name> --title "<title>" --short <code> [--url <url>] [--template <name>] [--running-heads symon|math]`
 - `notes list-templates`
 
 Notebook listing/selection:
@@ -55,6 +55,7 @@ Template defaults:
 - book parts:
   - `notes new-book-part series`
   - `notes new-book-part copyright`
+  - `notes new-book-part dedication`
   - `notes new-book-part preface`
   - `notes new-book-part summary`
   - `notes new-book-part conclusion`
@@ -62,7 +63,10 @@ Template defaults:
   - `notes new-book-part symbols`
   - `notes new-book-part index`
 - `classic-book` order:
-  - half-title, optional series page, title page, copyright, preface, contents, chapters, bibliography, answers, list of symbols, index
+  - half-title, optional series page, title page, copyright, dedication, preface, contents, chapters, bibliography, answers, index of symbols, index
+- `classic-book` running heads:
+  - `--running-heads symon`: Symon chapter/section markers
+  - `--running-heads math`: Apostol-style inward theorem/definition markers
 
 Figure management:
 

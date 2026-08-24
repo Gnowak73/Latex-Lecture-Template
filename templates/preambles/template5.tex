@@ -2,22 +2,25 @@
 \usepackage[T1]{fontenc}
 \usepackage{textcomp}
 \usepackage{microtype}
-\usepackage{tgtermes}
+% New Century Schoolbook and its companion mathematics closely match the
+% sturdy Century face used in mid-century Addison-Wesley textbooks.
+\usepackage{fouriernc}
 
 \usepackage[
     paperwidth=6in,
     paperheight=9in,
-    inner=0.45in,
-    outer=0.72in,
-    top=0.60in,
-    bottom=0.78in,
-    headsep=0.18in,
-    footskip=0.30in
+    inner=0.48in,
+    outer=0.73in,
+    top=0.86in,
+    bottom=0.72in,
+    headheight=12pt,
+    headsep=0.16in,
+    footskip=0.32in
 ]{geometry}
 
 \usepackage[
-    sorting=nyt,
-    style=alphabetic
+    sorting=none,
+    style=numeric
 ]{biblatex}
 \addbibresource{bibliography.bib}
 
@@ -25,7 +28,6 @@
 \usepackage{float}
 \usepackage[usenames,dvipsnames,svgnames]{xcolor}
 \usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb}
-\usepackage[amsthm]{newtxmath}
 \usepackage{mathrsfs}
 \usepackage{cancel}
 \usepackage{siunitx}
@@ -38,7 +40,8 @@
 \usepackage{titlesec}
 \usepackage{titletoc}
 \usepackage{fancyhdr}
-\usepackage[nottoc]{tocbibind}
+\usepackage{extramarks}
+\usepackage{etoolbox}
 \usepackage{makeidx}
 \usepackage{hyperref}
 \hypersetup{
@@ -61,9 +64,9 @@
 \let\iff\Leftrightarrow
 \let\epsilon\varepsilon
 
-\setlength{\parindent}{1.5em}
+\setlength{\parindent}{1.2em}
 \setlength{\parskip}{0pt}
-\linespread{1.02}
+\linespread{0.98}
 \raggedbottom
 
 \renewcommand{\contentsname}{CONTENTS}
@@ -77,12 +80,12 @@
 \titleformat{\chapter}[display]
   {\normalfont\centering}
   {\MakeUppercase{\chaptername} \thechapter}
-  {0.8em}
-  {\large\MakeUppercase}
-\titlespacing*{\chapter}{0pt}{0.10\textheight}{2.0em}
+  {1.0em}
+  {\large\bfseries\MakeUppercase}
+\titlespacing*{\chapter}{0pt}{0.30in}{1.7em}
 
 \titleformat{\section}[runin]
-  {\normalfont\fontseries{bx}\selectfont}
+  {\normalfont\bfseries}
   {\thesection}
   {0.5em}
   {}
@@ -99,46 +102,110 @@
 
 \titlecontents{chapter}
   [0pt]
-  {\vspace{1.1em}}
+  {\vspace{0.30em}\scshape}
   {Chapter \thecontentslabel.\quad}
   {}
-  {\titlerule*[0.7pc]{.}\contentspage}
+  {\normalfont\titlerule*[1.0pc]{.}\contentspage}
 \titlecontents{section}
   [1.6em]
   {}
   {\contentslabel{2.4em}}
   {}
-  {\titlerule*[0.7pc]{.}\contentspage}
+  {\titlerule*[1.0pc]{.}\contentspage}
 
 \makeatletter
 \renewcommand{\@makechapterhead}[1]{%
-  \vspace*{0.08\textheight}%
+  \vspace*{0.18in}%
   {\parindent \z@ \centering \normalfont
     \MakeUppercase{\chaptername}\space\thechapter\par
     \vskip 1.0em
-    \large\MakeUppercase{#1}\par\nobreak
-    \vskip 2.0em}}
+    \large\bfseries\MakeUppercase{#1}\par\nobreak
+    \vskip 1.35em}}
 \renewcommand{\@makeschapterhead}[1]{%
-  \vspace*{0.08\textheight}%
+  \markboth{\MakeUppercase{#1}}{\MakeUppercase{#1}}%
+  \vspace*{0.42in}%
   {\parindent \z@ \centering \normalfont
     \large\MakeUppercase{#1}\par\nobreak
-    \vskip 2.0em}}
+    \vskip 1.0em}}
 \makeatother
 
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[LE]{\thepage}
-\fancyhead[CE]{\small\MakeUppercase{\leftmark}}
-\fancyhead[CO]{\small\MakeUppercase{\rightmark}}
-\fancyhead[RO]{\thepage}
-\renewcommand{\headrulewidth}{0pt}
-\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{#1}}{}}
+\renewcommand{\sectionmark}[1]{\markright{\MakeUppercase{#1}}}
+
+% The default is Symon's chapter/section running-head scheme.  The generated
+% master may switch to the Apostol-style theorem tracker with
+% \symonrunningheads{math}.
+\newcommand{\symonrunningheadmode}{symon}
+\newcommand{\symonrunningheads}[1]{\renewcommand{\symonrunningheadmode}{#1}}
+\newcommand{\symonstatementmark}[2]{\extramarks{#1~#2}{#1~#2}}
+\newcommand{\symonnextstatementmark}[1]{%
+  \symonstatementmark{#1}{\thechapter-\number\numexpr\value{theorem}+1\relax}}
+\newcommand{\symonmathversomark}{%
+  \ifblank{\firstleftxmark}{}{[\firstleftxmark}}
+\newcommand{\symonmathrectomark}{%
+  \ifblank{\firstleftxmark}{}{\firstleftxmark]}}
+
+\fancypagestyle{symonmain}{%
+  \fancyhf{}%
+  \fancyhead[LE]{\thepage}%
+  \fancyhead[CE]{\small\MakeUppercase{\leftmark}}%
+  \fancyhead[RE]{\small
+    \ifdefstring{\symonrunningheadmode}{math}
+      {\symonmathversomark}
+      {[CHAP.\ \thechapter]}}%
+  \fancyhead[LO]{\small
+    \ifdefstring{\symonrunningheadmode}{math}
+      {\symonmathrectomark}
+      {[\thesection]}}%
+  \fancyhead[CO]{\small
+    \ifdefstring{\symonrunningheadmode}{math}
+      {\MakeUppercase{\leftmark}}
+      {\MakeUppercase{\rightmark}}}%
+  \fancyhead[RO]{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+
+\fancypagestyle{symonfront}{%
+  \fancyhf{}%
+  \fancyhead[LE]{\thepage}%
+  \fancyhead[CE,CO]{\small\MakeUppercase{\leftmark}}%
+  \fancyhead[RO]{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+
+\fancypagestyle{symonback}{%
+  \fancyhf{}%
+  \fancyhead[LE]{\thepage}%
+  \fancyhead[CE,CO]{\small\MakeUppercase{\leftmark}}%
+  \fancyhead[RO]{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+
+\pagestyle{symonmain}
 
 \fancypagestyle{plain}{%
-    \fancyhf{}%
-    \fancyhead[LE,RO]{\thepage}%
-    \renewcommand{\headrulewidth}{0pt}%
-    \renewcommand{\footrulewidth}{0pt}%
+  \fancyhf{}%
+  \fancyfoot[C]{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+
+\newcommand{\symontitleleaf}[1]{%
+  \clearpage
+  \thispagestyle{empty}%
+  \vspace*{0.16\textheight}%
+  \begin{center}\Large\MakeUppercase{#1}\end{center}%
+  \vfill
+  \clearpage
+}
+
+\defbibheading{symonbibliography}{%
+  \markboth{BIBLIOGRAPHY}{BIBLIOGRAPHY}%
+  \begin{center}\large BIBLIOGRAPHY\end{center}%
+  \vspace{0.6em}%
 }
 
 \theoremstyle{plain}
@@ -147,11 +214,21 @@
 \newtheorem{prop}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{conj}[theorem]{Conjecture}
+\renewcommand{\thetheorem}{\thechapter-\arabic{theorem}}
 
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{eg}[theorem]{Example}
 \newtheorem{ex}[theorem]{Exercise}
+
+\AtBeginEnvironment{theorem}{\symonnextstatementmark{THM.}}
+\AtBeginEnvironment{definition}{\symonnextstatementmark{DEF.}}
+\AtBeginEnvironment{lemma}{\symonnextstatementmark{LEM.}}
+\AtBeginEnvironment{prop}{\symonnextstatementmark{PROP.}}
+\AtBeginEnvironment{corollary}{\symonnextstatementmark{COR.}}
+\AtBeginEnvironment{conj}{\symonnextstatementmark{CONJ.}}
+\AtBeginEnvironment{eg}{\symonnextstatementmark{EX.}}
+\AtBeginEnvironment{ex}{\symonnextstatementmark{EXER.}}
 
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}

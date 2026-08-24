@@ -1,21 +1,27 @@
 % Copyright page (optional). Classic textbook layout after Symon's front matter.
 
+\clearpage
 \thispagestyle{empty}
-\vspace*{0.18\textheight}
+\vspace*{0.12\textheight}
 
 \makeatletter
 \begin{center}
-Copyright \textcopyright\ \the\year\\
-\@author
+\textit{Copyright \textcopyright\ \the\year}\\
+\ifx\bookpublisher\empty
+  \textbf{\MakeUppercase{\@author}}
+\else
+  \textbf{\MakeUppercase{\bookpublisher}}
+\fi
 
-\vspace{1.5em}
-Printed in the United States of America
+\vspace{1.0em}
+\textit{Printed in the United States of America}
 
-\vspace{3.0em}
-\MakeUppercase{All rights reserved. This book, or parts thereof, may not be
-reproduced in any form without written permission of the author.}
+\vspace{1.7em}
+{\small\scshape All rights reserved. This book, or parts thereof, may not be
+reproduced in any form without written permission of the publisher.}
 
-\vspace{2.0em}
-Library of Congress Catalog Card No. \rule{1.8in}{0.4pt}
+\vspace{0.8em}
+\textit{Library of Congress Catalog Card No.}\ \rule{1.45in}{0.4pt}
 \end{center}
 \makeatother
+\clearpage
