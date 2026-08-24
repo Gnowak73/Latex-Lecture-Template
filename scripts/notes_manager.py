@@ -113,36 +113,76 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openrigh
 \\title{{{title}}}
 \\author{{{author}}}
 \\newcommand{{\\bookpublisher}}{{{publisher}}}
+\\newcommand{{\\bookaffiliation}}{{{affiliation}}}
+\\newcommand{{\\bookedition}}{{{edition}}}
+\\newcommand{{\\bookprinting}}{{{printing}}}
+\\newcommand{{\\bookpublisherlocations}}{{{publisher_locations}}}
+\\newcommand{{\\bookcopyrightyears}}{{{copyright_years}}}
+\\newcommand{{\\bookcatalogcard}}{{{catalog_card}}}
+\\newcommand{{\\bookpublishermark}}{{{publisher_mark}}}
 \\symonrunningheads{{{running_heads}}}
 \\begin{{document}}
     \\frontmatter
     \\pagestyle{{symonfront}}
     \\hypersetup{{pageanchor=false}}
-    \\begin{{titlepage}}
-        \\thispagestyle{{empty}}
-        \\vspace*{{0.18\\textheight}}
-        \\begin{{center}}
-            {{\\LARGE\\MakeUppercase{{{title}}}\\par}}
-        \\end{{center}}
-        \\vfill
-    \\end{{titlepage}}
+    \\thispagestyle{{empty}}
+    \\begin{{tikzpicture}}[remember picture,overlay]
+        \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]
+            at ([yshift=-1.36in]current page text area.north)
+            {{\\fontsize{{38.5}}{{42}}\\selectfont\\textls[75]{{\\MakeUppercase{{{title}}}}}}};
+    \\end{{tikzpicture}}
+    \\null
+    \\clearpage
 
 {seriespage}
-    \\begin{{titlepage}}
-        \\thispagestyle{{empty}}
-        \\vspace*{{0.07\\textheight}}
-        \\begin{{center}}
-            {{\\Huge\\MakeUppercase{{{title}}}\\par}}
-            \\vspace{{0.6em}}
-            \\rule{{\\textwidth}}{{0.6pt}}
-            \\vspace{{2.0em}}
-            {{\\itshape by\\par}}
-            \\vspace{{1.0em}}
-            {{\\large\\bfseries\\MakeUppercase{{{author}}}\\par}}
-            \\vfill
-{publisherline}
-        \\end{{center}}
-    \\end{{titlepage}}
+    \\thispagestyle{{empty}}
+    \\begin{{tikzpicture}}[remember picture,overlay]
+            \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]
+                at ([yshift=-0.68in]current page text area.north)
+                {{\\fontsize{{38.5}}{{42}}\\selectfont\\textls[75]{{\\MakeUppercase{{{title}}}}}}};
+            \\draw[line width=0.6pt]
+                ([xshift=-2.03in,yshift=-1.24in]current page text area.north) --
+                ([xshift= 2.03in,yshift=-1.24in]current page text area.north);
+            \\node[anchor=north,inner sep=0pt]
+                at ([yshift=-1.85in]current page text area.north)
+                {{\\fontsize{{10}}{{12}}\\selectfont\\itshape by}};
+            \\node[anchor=north,inner sep=0pt]
+                at ([yshift=-2.10in]current page text area.north)
+                {{\\fontsize{{12.8}}{{15}}\\selectfont\\normalfont\\textls[130]{{\\MakeUppercase{{{author}}}}}}};
+            \\ifstrempty{{\\bookaffiliation}}{{}}{{
+                \\node[anchor=north,inner sep=0pt]
+                    at ([yshift=-2.42in]current page text area.north)
+                    {{\\fontsize{{10}}{{12}}\\selectfont\\itshape\\bookaffiliation}};
+            }}
+            \\ifstrempty{{\\bookedition}}{{}}{{
+                \\node[anchor=north,inner sep=0pt]
+                    at ([yshift=-4.39in]current page text area.north)
+                    {{\\fontsize{{8.7}}{{11}}\\selectfont\\normalfont\\MakeUppercase{{\\bookedition}}}};
+            }}
+            \\ifdefstring{{\\bookpublishermark}}{{triad}}{{
+                \\begin{{scope}}[
+                    shift={{([yshift=-5.75in]current page text area.north)}}
+                ]
+                    \\fill (0,0) -- (-5.7pt,-10pt) -- (5.7pt,-10pt) -- cycle;
+                    \\fill (-11.5pt,-11pt) -- (-0.5pt,-11pt) --
+                          (-6pt,-21pt) -- cycle;
+                    \\fill (0.5pt,-11pt) -- (11.5pt,-11pt) --
+                          (6pt,-21pt) -- cycle;
+                \\end{{scope}}
+            }}{{}}
+            \\ifstrempty{{\\bookpublisher}}{{}}{{
+                \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]
+                    at ([yshift=-6.64in]current page text area.north)
+                    {{\\fontsize{{12}}{{14}}\\selectfont\\bfseries\\textls[110]{{\\MakeUppercase{{\\bookpublisher}}}}}};
+            }}
+            \\ifstrempty{{\\bookpublisherlocations}}{{}}{{
+                \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]
+                    at ([yshift=-6.88in]current page text area.north)
+                    {{\\fontsize{{9}}{{12}}\\selectfont\\bfseries\\textls[30]{{\\MakeUppercase{{\\bookpublisherlocations}}}}}};
+            }}
+    \\end{{tikzpicture}}
+    \\null
+    \\clearpage
     \\hypersetup{{pageanchor=true}}
 {frontmatter}
     \\tableofcontents
@@ -182,6 +222,15 @@ def rewrite_master_for_current_notebook(path: Path):
     author = info.get("author", "Gabriel Nowaskie")
     series = info.get("series", "").strip()
     publisher = info.get("publisher", "").strip()
+    affiliation = info.get("affiliation", "").strip()
+    edition = info.get("edition", "").strip()
+    printing = info.get("printing", "").strip()
+    publisher_locations = info.get("publisher_locations", "").strip().replace("|", "\\\\")
+    copyright_years = info.get("copyright_years", "").strip() or "\\the\\year"
+    catalog_card = info.get("catalog_card", "").strip()
+    publisher_mark = info.get("publisher_mark", "none").strip().lower()
+    if publisher_mark not in {"none", "triad"}:
+        publisher_mark = "none"
     running_heads = info.get("running_heads", "symon").strip().lower()
     if running_heads not in {"symon", "math"}:
         running_heads = "symon"
@@ -202,16 +251,17 @@ def rewrite_master_for_current_notebook(path: Path):
             if series:
                 seriespage = (
                     "\n"
-                    "    \\begin{titlepage}\n"
-                    "        \\thispagestyle{empty}\n"
-                    "        \\vspace*{0.18\\textheight}\n"
-                    "        \\begin{center}\n"
-                    "            {\\normalsize This book is in the\\par}\n"
-                    "            \\vspace{0.8em}\n"
-                    f"            {{\\large\\MakeUppercase{{{series}}}\\par}}\n"
-                    "        \\end{center}\n"
-                    "        \\vfill\n"
-                    "    \\end{titlepage}\n"
+                    "    \\thispagestyle{empty}\n"
+                    "    \\begin{tikzpicture}[remember picture,overlay]\n"
+                    "        \\node[anchor=north,inner sep=0pt]\n"
+                    "            at ([yshift=-1.44in]current page text area.north)\n"
+                    "            {\\fontsize{10}{12}\\selectfont This book is in the};\n"
+                    "        \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]\n"
+                    "            at ([yshift=-1.64in]current page text area.north)\n"
+                    f"            {{\\fontsize{{10}}{{12}}\\selectfont\\textls[75]{{\\MakeUppercase{{{series}}}}}}};\n"
+                    "    \\end{tikzpicture}\n"
+                    "    \\null\n"
+                    "    \\clearpage\n"
                 )
             elif (path / "series.tex").exists():
                 seriespage = "\n    \\input{series.tex}\n"
@@ -255,6 +305,13 @@ def rewrite_master_for_current_notebook(path: Path):
                 title=title,
                 author=author,
                 publisher=publisher,
+                affiliation=affiliation,
+                edition=edition,
+                printing=printing,
+                publisher_locations=publisher_locations,
+                copyright_years=copyright_years,
+                catalog_card=catalog_card,
+                publisher_mark=publisher_mark,
                 date=date,
                 running_heads=running_heads,
                 seriespage=seriespage,
@@ -496,6 +553,13 @@ def init_notebook(
     series: str = "",
     publisher: str = "",
     running_heads: str = "symon",
+    affiliation: str = "",
+    edition: str = "",
+    printing: str = "",
+    publisher_locations: str = "",
+    copyright_years: str = "",
+    catalog_card: str = "",
+    publisher_mark: str = "none",
 ):
     template = normalize_template_name(template)
     structure = structure.strip().lower()
@@ -519,6 +583,13 @@ def init_notebook(
         f"author: '{author}'\n"
         f"series: '{series}'\n"
         f"publisher: '{publisher}'\n"
+        f"affiliation: '{affiliation}'\n"
+        f"edition: '{edition}'\n"
+        f"printing: '{printing}'\n"
+        f"publisher_locations: '{publisher_locations}'\n"
+        f"copyright_years: '{copyright_years}'\n"
+        f"catalog_card: '{catalog_card}'\n"
+        f"publisher_mark: '{publisher_mark}'\n"
         f"running_heads: '{running_heads}'\n"
         f"template: '{template}'\n"
         f"structure: '{structure}'\n"
@@ -533,16 +604,17 @@ def init_notebook(
             if template == "classic-book" and series:
                 initial_seriespage = (
                     "\n"
-                    "    \\begin{titlepage}\n"
-                    "        \\thispagestyle{empty}\n"
-                    "        \\vspace*{0.18\\textheight}\n"
-                    "        \\begin{center}\n"
-                    "            {\\normalsize This book is in the\\par}\n"
-                    "            \\vspace{0.8em}\n"
-                    f"            {{\\large\\MakeUppercase{{{series}}}\\par}}\n"
-                    "        \\end{center}\n"
-                    "        \\vfill\n"
-                    "    \\end{titlepage}\n"
+                    "    \\thispagestyle{empty}\n"
+                    "    \\begin{tikzpicture}[remember picture,overlay]\n"
+                    "        \\node[anchor=north,inner sep=0pt]\n"
+                    "            at ([yshift=-1.44in]current page text area.north)\n"
+                    "            {\\fontsize{10}{12}\\selectfont This book is in the};\n"
+                    "        \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]\n"
+                    "            at ([yshift=-1.64in]current page text area.north)\n"
+                    f"            {{\\fontsize{{10}}{{12}}\\selectfont\\textls[75]{{\\MakeUppercase{{{series}}}}}}};\n"
+                    "    \\end{tikzpicture}\n"
+                    "    \\null\n"
+                    "    \\clearpage\n"
                 )
             master_template = (
                 MASTER_TEMPLATE_BOOK_CHAPTERS
@@ -554,6 +626,13 @@ def init_notebook(
                     title=title,
                     author=author,
                     publisher=publisher,
+                    affiliation=affiliation,
+                    edition=edition,
+                    printing=printing,
+                    publisher_locations=publisher_locations.replace("|", "\\\\"),
+                    copyright_years=copyright_years or "\\the\\year",
+                    catalog_card=catalog_card,
+                    publisher_mark=publisher_mark,
                     date=date,
                     running_heads=running_heads,
                     seriespage=initial_seriespage,
@@ -608,7 +687,13 @@ def init_notebook(
 
 def cmd_init_course(args):
     path = notebook_dir("course", args.name)
-    init_notebook(path, args.title, args.short, args.url, args.template, args.structure, args.author, args.series, args.publisher, args.running_heads)
+    init_notebook(
+        path, args.title, args.short, args.url, args.template, args.structure,
+        args.author, args.series, args.publisher, args.running_heads,
+        args.affiliation, args.edition, args.printing,
+        "|".join(args.publisher_locations), args.copyright_years, args.catalog_card,
+        args.publisher_mark,
+    )
     print(f"Initialized course at {path}")
 
 
@@ -622,7 +707,13 @@ def cmd_list_courses(_args):
 
 def cmd_init_topic(args):
     path = notebook_dir("topic", args.name)
-    init_notebook(path, args.title, args.short, args.url, args.template, args.structure, args.author, args.series, args.publisher, args.running_heads)
+    init_notebook(
+        path, args.title, args.short, args.url, args.template, args.structure,
+        args.author, args.series, args.publisher, args.running_heads,
+        args.affiliation, args.edition, args.printing,
+        "|".join(args.publisher_locations), args.copyright_years, args.catalog_card,
+        args.publisher_mark,
+    )
     print(f"Initialized topic at {path}")
 
 
@@ -882,6 +973,13 @@ def build_parser():
     a.add_argument("--author", default="Gabriel Nowaskie")
     a.add_argument("--series", default="", help="Optional classic-book series name")
     a.add_argument("--publisher", default="", help="Optional classic-book publisher/imprint line")
+    a.add_argument("--affiliation", default="", help="Optional institution shown below the author")
+    a.add_argument("--edition", default="", help="Optional edition line, for example 'Second Edition'")
+    a.add_argument("--printing", default="", help="Optional printing line, for example 'Third Printing'")
+    a.add_argument("--publisher-location", dest="publisher_locations", action="append", default=[], help="Publisher location line; repeat for multiple lines")
+    a.add_argument("--copyright-years", default="", help="Copyright year or years; defaults to the current year")
+    a.add_argument("--catalog-card", default="", help="Optional Library of Congress catalog card number")
+    a.add_argument("--publisher-mark", choices=["none", "triad"], default="none", help="Optional title-page publisher mark")
     a.add_argument("--running-heads", choices=["symon", "math"], default="symon", help="Classic-book running heads: Symon chapter/section or Apostol theorem tracking")
     a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
     a.add_argument(
@@ -902,6 +1000,13 @@ def build_parser():
     a.add_argument("--author", default="Gabriel Nowaskie")
     a.add_argument("--series", default="", help="Optional classic-book series name")
     a.add_argument("--publisher", default="", help="Optional classic-book publisher/imprint line")
+    a.add_argument("--affiliation", default="", help="Optional institution shown below the author")
+    a.add_argument("--edition", default="", help="Optional edition line, for example 'Second Edition'")
+    a.add_argument("--printing", default="", help="Optional printing line, for example 'Third Printing'")
+    a.add_argument("--publisher-location", dest="publisher_locations", action="append", default=[], help="Publisher location line; repeat for multiple lines")
+    a.add_argument("--copyright-years", default="", help="Copyright year or years; defaults to the current year")
+    a.add_argument("--catalog-card", default="", help="Optional Library of Congress catalog card number")
+    a.add_argument("--publisher-mark", choices=["none", "triad"], default="none", help="Optional title-page publisher mark")
     a.add_argument("--running-heads", choices=["symon", "math"], default="symon", help="Classic-book running heads: Symon chapter/section or Apostol theorem tracking")
     a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
     a.add_argument(

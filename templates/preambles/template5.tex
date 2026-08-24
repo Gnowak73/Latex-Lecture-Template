@@ -26,12 +26,13 @@
 
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage[usenames,dvipsnames,svgnames]{xcolor}
+\usepackage[dvipsnames,svgnames]{xcolor}
 \usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb}
 \usepackage{mathrsfs}
 \usepackage{cancel}
 \usepackage{siunitx}
 \usepackage{tikz}
+\usepackage{tikzpagenodes}
 \usepackage{tikz-cd}
 \usepackage{import}
 \usepackage{pdfpages}
@@ -69,7 +70,32 @@
 \linespread{0.98}
 \raggedbottom
 
+% Blank versos inserted by openright carry no running head or folio.
+\makeatletter
+\renewcommand{\cleardoublepage}{%
+  \clearpage
+  \if@twoside
+    \ifodd\value{page}\else
+      \hbox{}\thispagestyle{empty}\newpage
+      \if@twocolumn\hbox{}\newpage\fi
+    \fi
+  \fi}
+\makeatother
+
 \renewcommand{\contentsname}{CONTENTS}
+
+% Symon's contents heading sits higher than other unnumbered chapter heads.
+\makeatletter
+\renewcommand{\tableofcontents}{%
+  \cleardoublepage
+  \thispagestyle{plain}%
+  \markboth{CONTENTS}{CONTENTS}%
+  \vspace*{0.045in}%
+  \begin{center}\large CONTENTS\end{center}%
+  \vspace{-0.2em}%
+  \@starttoc{toc}%
+}
+\makeatother
 
 \renewcommand{\thechapter}{\arabic{chapter}}
 \renewcommand{\thesection}{\thechapter-\arabic{section}}
@@ -101,15 +127,15 @@
 \titlespacing*{\subsection}{0pt}{0.8em plus 0.2em minus 0.1em}{0.5em}
 
 \titlecontents{chapter}
-  [0pt]
+  [0.45em]
   {\vspace{0.30em}\scshape}
-  {Chapter \thecontentslabel.\quad}
+  {Chapter \thecontentslabel.\hspace{1.65em}}
   {}
   {\normalfont\titlerule*[1.0pc]{.}\contentspage}
 \titlecontents{section}
-  [1.6em]
+  [4.4em]
   {}
-  {\contentslabel{2.4em}}
+  {\contentslabel{2.7em}}
   {}
   {\titlerule*[1.0pc]{.}\contentspage}
 
@@ -117,13 +143,13 @@
 \renewcommand{\@makechapterhead}[1]{%
   \vspace*{0.18in}%
   {\parindent \z@ \centering \normalfont
-    \MakeUppercase{\chaptername}\space\thechapter\par
+    \textls[130]{\MakeUppercase{\chaptername}}\quad\thechapter\par
     \vskip 1.0em
     \large\bfseries\MakeUppercase{#1}\par\nobreak
     \vskip 1.35em}}
 \renewcommand{\@makeschapterhead}[1]{%
   \markboth{\MakeUppercase{#1}}{\MakeUppercase{#1}}%
-  \vspace*{0.42in}%
+  \vspace*{0.36in}%
   {\parindent \z@ \centering \normalfont
     \large\MakeUppercase{#1}\par\nobreak
     \vskip 1.0em}}
@@ -152,11 +178,11 @@
   \fancyhead[RE]{\small
     \ifdefstring{\symonrunningheadmode}{math}
       {\symonmathversomark}
-      {[CHAP.\ \thechapter]}}%
+      {[CHAP.\ \thechapter}}%
   \fancyhead[LO]{\small
     \ifdefstring{\symonrunningheadmode}{math}
       {\symonmathrectomark}
-      {[\thesection]}}%
+      {\thesection]}}%
   \fancyhead[CO]{\small
     \ifdefstring{\symonrunningheadmode}{math}
       {\MakeUppercase{\leftmark}}

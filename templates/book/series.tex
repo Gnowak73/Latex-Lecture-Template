@@ -2,10 +2,15 @@
 % You can also set `series: 'Your Series Name'` in info.yaml instead.
 
 \thispagestyle{empty}
-\vspace*{0.18\textheight}
-\begin{center}
-    {\normalsize This book is in the\par}
-    \vspace{0.8em}
-    {\large\MakeUppercase{YOUR SERIES NAME}\par}
-\end{center}
-\cleardoublepage
+\begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=north,inner sep=0pt]
+        at ([yshift=-1.44in]current page text area.north)
+        {\fontsize{10}{12}\selectfont This book is in the};
+    \node[anchor=north,inner sep=0pt,text width=\textwidth,align=center]
+        at ([yshift=-1.64in]current page text area.north)
+        {\fontsize{10}{12}\selectfont
+          \textls[75]{\MakeUppercase{YOUR SERIES NAME}}};
+\end{tikzpicture}
+\null
+% The historical sequence places the title page immediately after this leaf.
+\clearpage

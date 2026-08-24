@@ -57,19 +57,31 @@ notes init-course analysis \
   --title "Mathematical Analysis" \
   --short ANALYSIS \
   --template classic-book \
+  --author "Tom M. Apostol" \
+  --affiliation "California Institute of Technology" \
+  --edition "First Edition" \
+  --printing "First Printing" \
+  --series "ADDISON-WESLEY SERIES IN MATHEMATICS" \
+  --publisher "ADDISON-WESLEY PUBLISHING COMPANY, INC." \
+  --publisher-location "Reading, Massachusetts, U.S.A." \
+  --publisher-location "London, England" \
+  --copyright-years "1957, 1960" \
+  --catalog-card "60-5164" \
+  --publisher-mark triad \
   --running-heads math
 ```
 
-The same setting can be changed later in `info.yaml` with
-`running_heads: 'symon'` or `running_heads: 'math'`, followed by
-`notes fix-master`.
+All title and copyright fields are optional. The same settings can be changed
+later in `info.yaml`, including `running_heads: 'symon'` or
+`running_heads: 'math'`, followed by `notes fix-master`.
 
 ```bash
-./bin/notes new-book-part copyright
-./bin/notes new-book-part preface
-./bin/notes new-book-part answers
-./bin/notes new-book-part index
-./bin/notes fix-master
+notes new-book-part copyright
+notes new-book-part dedication
+notes new-book-part preface
+notes new-book-part answers
+notes new-book-part index
+notes fix-master
 ```
 
 In Neovim (leader is Space):

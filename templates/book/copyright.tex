@@ -1,27 +1,53 @@
-% Copyright page (optional). Classic textbook layout after Symon's front matter.
+% Copyright page (optional). Positions and measure follow Symon's second edition.
 
 \clearpage
 \thispagestyle{empty}
-\vspace*{0.12\textheight}
 
-\makeatletter
-\begin{center}
-\textit{Copyright \textcopyright\ \the\year}\\
-\ifx\bookpublisher\empty
-  \textbf{\MakeUppercase{\@author}}
-\else
-  \textbf{\MakeUppercase{\bookpublisher}}
-\fi
+\begin{tikzpicture}[remember picture,overlay]
+  \node[anchor=north,inner sep=0pt]
+    at ([xshift=0.08in,yshift=-1.10in]current page text area.north)
+    {\fontsize{10}{12}\selectfont\itshape
+      Copyright \textcopyright\ \bookcopyrightyears};
 
-\vspace{1.0em}
-\textit{Printed in the United States of America}
+  \node[anchor=north,inner sep=0pt,text width=3.55in,align=center]
+    at ([xshift=0.08in,yshift=-1.27in]current page text area.north)
+    {\fontsize{9.2}{11}\selectfont\bfseries
+      \textls[50]{\MakeUppercase{\bookpublisher}}};
 
-\vspace{1.7em}
-{\small\scshape All rights reserved. This book, or parts thereof, may not be
-reproduced in any form without written permission of the publisher.}
+  \draw[line width=0.55pt]
+    ([xshift=-0.60in,yshift=-1.49in]current page text area.north) --
+    ([xshift= 0.76in,yshift=-1.49in]current page text area.north);
 
-\vspace{0.8em}
-\textit{Library of Congress Catalog Card No.}\ \rule{1.45in}{0.4pt}
-\end{center}
-\makeatother
+  \node[anchor=north,inner sep=0pt]
+    at ([xshift=0.08in,yshift=-1.61in]current page text area.north)
+    {\fontsize{10}{12}\selectfont\itshape
+      Printed in the United States of America};
+
+  \node[anchor=north,inner sep=0pt,text width=3.10in,align=center]
+    at ([xshift=0.08in,yshift=-1.88in]current page text area.north)
+    {\fontsize{7}{13}\selectfont\bfseries
+      \textls[35]{\MakeUppercase{All rights reserved. This book, or parts there-}}\\
+      \textls[35]{\MakeUppercase{of, may not be reproduced in any form with-}}\\[1.7pt]
+      \textls[35]{\MakeUppercase{out written permission of the publisher.}}};
+
+  \node[anchor=north,inner sep=0pt]
+    at ([xshift=0.08in,yshift=-2.47in]current page text area.north)
+    {\fontsize{10}{12}\selectfont\itshape
+      Library of Congress Catalog Card No.\ \ifstrempty{\bookcatalogcard}
+        {\rule{0.72in}{0.4pt}}{\bookcatalogcard}};
+
+  \ifstrempty{\bookedition}{}{
+    \node[anchor=north,inner sep=0pt]
+      at ([xshift=0.08in,yshift=-2.82in]current page text area.north)
+      {\fontsize{10}{12}\selectfont\normalfont\bookedition};
+  }
+
+  \ifstrempty{\bookprinting}{}{
+    \node[anchor=north,inner sep=0pt]
+      at ([xshift=0.08in,yshift=-3.05in]current page text area.north)
+      {\fontsize{10}{12}\selectfont\normalfont\bookprinting};
+  }
+\end{tikzpicture}
+
+\null
 \clearpage
