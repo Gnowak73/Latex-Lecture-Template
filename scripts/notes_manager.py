@@ -54,6 +54,41 @@ TEMPLATE_ALIASES = {
     "template5": "classic-book",
 }
 
+LETTER_PRINT_TEMPLATE = r"""\documentclass[letterpaper]{article}
+\usepackage[margin=0in]{geometry}
+\usepackage{pdfpages}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\pagestyle{empty}
+
+\newcommand{\booktrimmarks}{%
+  \thispagestyle{empty}%
+  \begin{tikzpicture}[remember picture,overlay,line width=0.2pt,line cap=butt]
+    \coordinate (trimnw) at ([xshift=-3in,yshift=4.5in]current page.center);
+    \coordinate (trimne) at ([xshift=3in,yshift=4.5in]current page.center);
+    \coordinate (trimsw) at ([xshift=-3in,yshift=-4.5in]current page.center);
+    \coordinate (trimse) at ([xshift=3in,yshift=-4.5in]current page.center);
+    \draw (trimsw) rectangle (trimne);
+    \draw ($(trimnw)+(-0.25in,0)$) -- ($(trimnw)+(-0.04in,0)$);
+    \draw ($(trimnw)+(0,0.04in)$) -- ($(trimnw)+(0,0.25in)$);
+    \draw ($(trimne)+(0.04in,0)$) -- ($(trimne)+(0.25in,0)$);
+    \draw ($(trimne)+(0,0.04in)$) -- ($(trimne)+(0,0.25in)$);
+    \draw ($(trimsw)+(-0.25in,0)$) -- ($(trimsw)+(-0.04in,0)$);
+    \draw ($(trimsw)+(0,-0.04in)$) -- ($(trimsw)+(0,-0.25in)$);
+    \draw ($(trimse)+(0.04in,0)$) -- ($(trimse)+(0.25in,0)$);
+    \draw ($(trimse)+(0,-0.04in)$) -- ($(trimse)+(0,-0.25in)$);
+  \end{tikzpicture}%
+}
+
+\begin{document}
+\includepdf[
+  pages=-,
+  noautoscale=true,
+  pagecommand={\booktrimmarks}
+]{master.pdf}
+\end{document}
+"""
+
 MASTER_TEMPLATE = """\\documentclass[a4paper]{{report}}
 \\input{{./preamble.tex}}
 \\title{{{title}}}
@@ -882,6 +917,36 @@ def cmd_compile(args):
     subprocess.run(["latexmk", "-pdf", "-f", "-interaction=nonstopmode", str(master)], cwd=path, check=False)
 
 
+def cmd_print_letter(args):
+    path = current_course_path() if args.current else find_notebook(args.course)
+    master = path / "master.tex"
+    if not master.exists():
+        raise SystemExit(f"Missing {master}")
+
+    master_build = subprocess.run(
+        ["latexmk", "-pdf", "-interaction=nonstopmode", str(master)],
+        cwd=path,
+        check=False,
+    )
+    master_pdf = path / "master.pdf"
+    if master_build.returncode != 0 or not master_pdf.exists():
+        raise SystemExit("Book compilation failed; print proof was not generated.")
+
+    wrapper = path / "print-letter.tex"
+    wrapper.write_text(LETTER_PRINT_TEMPLATE, encoding="utf-8")
+    proof_build = subprocess.run(
+        ["latexmk", "-pdf", "-interaction=nonstopmode", str(wrapper)],
+        cwd=path,
+        check=False,
+    )
+    proof_pdf = path / "print-letter.pdf"
+    if proof_build.returncode != 0 or not proof_pdf.exists():
+        raise SystemExit("Letter-size print proof compilation failed.")
+
+    print(proof_pdf)
+    print("Print at Actual Size / 100%; cut on the 6x9 trim box or crop marks.")
+
+
 def cmd_list_figures(_args):
     path = current_course_path()
     figdir = path / "figures"
@@ -1143,6 +1208,12 @@ def build_parser():
     g.add_argument("--current", action="store_true")
     g.add_argument("--course")
     a.set_defaults(func=cmd_compile)
+
+    a = sub.add_parser("print-letter", help="Create a Letter-size 6x9 cutting proof")
+    g = a.add_mutually_exclusive_group(required=True)
+    g.add_argument("--current", action="store_true")
+    g.add_argument("--course")
+    a.set_defaults(func=cmd_print_letter)
 
     a = sub.add_parser("list-figures", help="List figure names in current course")
     a.set_defaults(func=cmd_list_figures)

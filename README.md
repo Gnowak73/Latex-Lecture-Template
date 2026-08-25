@@ -43,6 +43,17 @@ Add a lecture and compile:
 ./bin/notes compile --current
 ```
 
+Create a Letter-size cutting proof for a 6x9 classic book:
+
+```bash
+notes print-letter --current
+# or: notes print-letter --course symon-layout-test
+```
+
+This writes `print-letter.pdf` beside `master.pdf`, centered at its true 6x9
+size on 8.5x11 Letter paper with a trim box and corner crop marks. Print that
+PDF using `Actual Size` or `100%`, never `Fit` or `Scale to page`.
+
 Templates: multiple lecture-note templates (based on Gilles Castel’s layouts), `lecture-book` (tufte/masterthesis style), and `classic-book` (6x9 Addison-Wesley/Symon-style textbook). Book templates always use chapters (`chap_XX.tex` with `\chapter{...}`).
 
 The `classic-book` template vendors the custom `Symon Schoolbook` Type 1 family into each project. It is an optically lightened, renamed derivative of TeX Gyre Schola with unchanged TeX metrics, so line breaks and the Fourier New Century Schoolbook mathematics remain stable. Rebuild the bundled PFB and OTF files with `fontforge -script scripts/build_symon_schoolbook.py`.
