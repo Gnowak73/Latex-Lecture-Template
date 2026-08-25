@@ -127,11 +127,15 @@
 }
 \makeatother
 
+% Keep the sturdier Schoolbook separator inside otherwise Latin Modern labels.
+\DeclareRobustCommand{\symonnumberdash}{%
+  \texorpdfstring{{\fontfamily{qcs}\fontseries{m}\fontshape{n}\selectfont
+    \textendash}}{-}}
 \renewcommand{\thechapter}{\arabic{chapter}}
-\renewcommand{\thesection}{\thechapter\textendash\arabic{section}}
-\renewcommand{\thesubsection}{\thesection\textendash\arabic{subsection}}
+\renewcommand{\thesection}{\thechapter\symonnumberdash\arabic{section}}
+\renewcommand{\thesubsection}{\thesection\symonnumberdash\arabic{subsection}}
 \numberwithin{equation}{chapter}
-\renewcommand{\theequation}{\thechapter\textendash\arabic{equation}}
+\renewcommand{\theequation}{\thechapter\symonnumberdash\arabic{equation}}
 
 \titleformat{\chapter}[display]
   {\normalfont\symonschoolbookfont\centering}
@@ -141,15 +145,18 @@
 \titlespacing*{\chapter}{0pt}{0.30in}{1.7em}
 
 \titleformat{\section}[runin]
-  {\normalfont\fontfamily{lmr}\fontsize{9.55}{11.2}\selectfont\bfseries}
+  {\normalfont\symonschoolbookfont\fontsize{9.55}{11.2}\selectfont\bfseries}
   {\textls[12]{\thesection}}
-  {0.55em}
-  {\textls[12]}
+  {0.50em}
+  {\symonsectiontitle}
   [.]
-\titlespacing*{\section}{1.1em}{1.0em plus 0.3em minus 0.1em}{1.25em}
+\titlespacing*{\section}{1.18em}{1.0em plus 0.3em minus 0.1em}{1.035em}
+
+\newcommand{\symonsectiontitle}[1]{%
+  \textls[-12]{{\spaceskip=0.51em\relax #1}}}
 
 \titleformat{\subsection}[runin]
-  {\normalfont\fontfamily{lmr}\fontsize{9.35}{11}\selectfont\itshape}
+  {\normalfont\symonschoolbookfont\fontsize{9.35}{11}\selectfont}
   {\textls[8]{\thesubsection}}
   {0.5em}
   {}
@@ -198,7 +205,8 @@
 \newcommand{\symonrunningheads}[1]{\renewcommand{\symonrunningheadmode}{#1}}
 \newcommand{\symonstatementmark}[2]{\extramarks{#1~#2}{#1~#2}}
 \newcommand{\symonnextstatementmark}[1]{%
-  \symonstatementmark{#1}{\thechapter-\number\numexpr\value{theorem}+1\relax}}
+  \symonstatementmark{#1}{\thechapter\symonnumberdash
+    \number\numexpr\value{theorem}+1\relax}}
 \newcommand{\symonmathversomark}{%
   \ifblank{\firstleftxmark}{}{[\firstleftxmark}}
 \newcommand{\symonmathrectomark}{%
@@ -275,7 +283,7 @@
 \newtheorem{prop}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{conj}[theorem]{Conjecture}
-\renewcommand{\thetheorem}{\thechapter-\arabic{theorem}}
+\renewcommand{\thetheorem}{\thechapter\symonnumberdash\arabic{theorem}}
 
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
