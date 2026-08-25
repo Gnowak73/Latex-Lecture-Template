@@ -68,6 +68,7 @@ Template defaults:
   - `notes new-book-part index`
 - Classic book order (`6x9book` and `a5book`):
   - half-title, optional series page, title page, copyright, dedication, preface, contents, chapters, bibliography, answers, index of symbols, index
+  - bibliography is generated only when `bibliography.bib` contains a BibTeX entry
 - Classic book running heads:
   - `--running-heads symon`: Symon chapter/section markers
   - `--running-heads math`: Apostol-style inward theorem/definition markers

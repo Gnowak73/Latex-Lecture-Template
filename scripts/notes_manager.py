@@ -290,9 +290,7 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openrigh
     \\backmatter
     \\pagestyle{{symonback}}
 {conclusion}
-    \\symontitleleaf{{Bibliography}}
-    \\addcontentsline{{toc}}{{chapter}}{{Bibliography}}
-    \\printbibliography[heading=symonbibliography]
+{bibliography}
 {backmatter}
 \\end{{document}}
 """
@@ -327,6 +325,23 @@ def symbols_define_list(path: Path) -> bool:
     except Exception:
         return False
     return "\\newcommand{\\listofsymbols}" in sym_txt or "\\def\\listofsymbols" in sym_txt
+
+
+def bibliography_has_entries(path: Path) -> bool:
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8", errors="ignore")
+    return re.search(r"^\s*@\w+\s*[{(]", text, flags=re.MULTILINE) is not None
+
+
+def classic_bibliography_block(path: Path) -> str:
+    if not bibliography_has_entries(path / "bibliography.bib"):
+        return ""
+    return (
+        "    \\symontitleleaf{Bibliography}\n"
+        "    \\addcontentsline{toc}{chapter}{Bibliography}\n"
+        "    \\printbibliography[heading=symonbibliography]"
+    )
 
 
 def rewrite_master_for_current_notebook(path: Path):
@@ -447,6 +462,7 @@ def rewrite_master_for_current_notebook(path: Path):
                 publisherline=publisherline,
                 frontmatter=frontmatter,
                 conclusion=conclusion,
+                bibliography=classic_bibliography_block(path),
                 backmatter=backmatter,
             ),
             encoding="utf-8",
@@ -800,6 +816,7 @@ def init_notebook(
                     ),
                     frontmatter="",
                     conclusion="",
+                    bibliography=classic_bibliography_block(path),
                     backmatter="",
                 ),
                 encoding="utf-8",

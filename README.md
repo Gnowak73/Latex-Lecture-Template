@@ -78,6 +78,8 @@ The `6x9book` and `a5book` templates vendor the custom `Symon Schoolbook` Type 1
 
 For both classic book sizes, optional book parts are included in this order when present:
 half-title, series page, title page, copyright, dedication, preface, contents, chapters, bibliography, answers to odd-numbered problems, index of symbols, index.
+The bibliography leaf is omitted when `bibliography.bib` has no BibTeX entries;
+after adding an `@book`, `@article`, or other entry, run `notes fix-master` to include it.
 
 Choose the running-head scheme when creating the book. `symon` uses chapter and
 section heads; `math` replaces their inner markers with the current numbered
