@@ -1,13 +1,16 @@
 % Series page (optional). Replace the text with the series name for this book.
 % You can also set `series: 'Your Series Name'` in info.yaml instead.
 
+\providecommand{\bookserieslineone}{1.44in}
+\providecommand{\bookserieslinetwo}{1.64in}
+
 \thispagestyle{empty}
 \begin{tikzpicture}[remember picture,overlay]
     \node[anchor=north,inner sep=0pt]
-        at ([yshift=-1.44in]current page text area.north)
+        at ([yshift=-\bookserieslineone]current page text area.north)
         {\fontsize{10}{12}\selectfont This book is in the};
     \node[anchor=north,inner sep=0pt,text width=\textwidth,align=center]
-        at ([yshift=-1.64in]current page text area.north)
+        at ([yshift=-\bookserieslinetwo]current page text area.north)
         {\fontsize{10}{12}\selectfont
           \textls[75]{\MakeUppercase{YOUR SERIES NAME}}};
 \end{tikzpicture}

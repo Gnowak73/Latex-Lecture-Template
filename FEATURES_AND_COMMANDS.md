@@ -35,6 +35,8 @@ Lecture management:
 - `notes pick-view`
 - `notes compile --current`
 - `notes compile --course <name>`
+- `notes print-letter --current`: center a 6x9 book page on Letter with trim marks
+- `notes print-a5-booklet --current`: impose A6 pages two-up on folded A5 sheets
 
 Template defaults:
 
@@ -45,13 +47,15 @@ Template defaults:
   - `lecture-light` (or `2`)
   - `lecture-dynamic` (or `3`)
   - `lecture-book` (or `4`)
-  - `classic-book` (or `5`)
+  - `6x9book` (or `5`; `classic-book` is a compatibility alias)
+  - `a5book` (or `6`; A6 finished pages folded from A5 sheets)
 - file mapping:
   - `lecture-color` -> `templates/preambles/template1.tex`
   - `lecture-light` -> `templates/preambles/template2.tex`
   - `lecture-dynamic` -> `templates/preambles/template3.tex`
   - `lecture-book` -> `templates/preambles/template4.tex`
-  - `classic-book` -> `templates/preambles/template5.tex`
+  - `6x9book` -> `templates/preambles/template5.tex`
+  - `a5book` -> `templates/preambles/a5book.tex` plus the shared classic rules
 - book parts:
   - `notes new-book-part series`
   - `notes new-book-part copyright`
@@ -62,9 +66,9 @@ Template defaults:
   - `notes new-book-part answers`
   - `notes new-book-part symbols`
   - `notes new-book-part index`
-- `classic-book` order:
+- Classic book order (`6x9book` and `a5book`):
   - half-title, optional series page, title page, copyright, dedication, preface, contents, chapters, bibliography, answers, index of symbols, index
-- `classic-book` running heads:
+- Classic book running heads:
   - `--running-heads symon`: Symon chapter/section markers
   - `--running-heads math`: Apostol-style inward theorem/definition markers
 

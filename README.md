@@ -54,11 +54,29 @@ This writes `print-letter.pdf` beside `master.pdf`, centered at its true 6x9
 size on 8.5x11 Letter paper with a trim box and corner crop marks. Print that
 PDF using `Actual Size` or `100%`, never `Fit` or `Scale to page`.
 
-Templates: multiple lecture-note templates (based on Gilles Castel’s layouts), `lecture-book` (tufte/masterthesis style), and `classic-book` (6x9 Addison-Wesley/Symon-style textbook). Book templates always use chapters (`chap_XX.tex` with `\chapter{...}`).
+Create and print an A5-folded booklet. The source PDF uses A6 finished pages;
+the print PDF places two pages on each side of an A5 landscape sheet in
+booklet order and pads the total to a multiple of four pages.
 
-The `classic-book` template vendors the custom `Symon Schoolbook` Type 1 family into each project. It is an optically lightened, renamed derivative of TeX Gyre Schola with unchanged TeX metrics, so line breaks and the Fourier New Century Schoolbook mathematics remain stable. Rebuild the bundled PFB and OTF files with `fontforge -script scripts/build_symon_schoolbook.py`.
+```bash
+notes init-course pamphlet \
+  --title "Small Pamphlet" \
+  --short PAMPHLET \
+  --template a5book \
+  --author "Your Name"
+notes set-current pamphlet
+notes new-lecture --title "Introduction"
+notes print-a5-booklet --current
+```
 
-For `classic-book`, optional book parts are included in this order when present:
+Print `print-a5-booklet.pdf` at `Actual Size` or `100%`, double-sided, with
+`Flip on short edge`, then stack and fold the sheets in half.
+
+Templates: multiple lecture-note templates (based on Gilles Castel’s layouts), `lecture-book` (tufte/masterthesis style), `6x9book` (the 6x9 Addison-Wesley/Symon-style textbook), and `a5book` (the analogous A6 finished page for folding A5 sheets). Book templates always use chapters (`chap_XX.tex` with `\chapter{...}`).
+
+The `6x9book` and `a5book` templates vendor the custom `Symon Schoolbook` Type 1 family into each project. It is an optically lightened, renamed derivative of TeX Gyre Schola with unchanged TeX metrics, so line breaks and the Fourier New Century Schoolbook mathematics remain stable. Rebuild the bundled PFB and OTF files with `fontforge -script scripts/build_symon_schoolbook.py`.
+
+For both classic book sizes, optional book parts are included in this order when present:
 half-title, series page, title page, copyright, dedication, preface, contents, chapters, bibliography, answers to odd-numbered problems, index of symbols, index.
 
 Choose the running-head scheme when creating the book. `symon` uses chapter and
@@ -69,7 +87,7 @@ statement (`THM.`, `DEF.`, `LEM.`, and so on).
 notes init-course analysis \
   --title "Mathematical Analysis" \
   --short ANALYSIS \
-  --template classic-book \
+  --template 6x9book \
   --author "Tom M. Apostol" \
   --affiliation "California Institute of Technology" \
   --edition "First Edition" \
@@ -156,7 +174,8 @@ Current built-ins:
 - `lecture-light` (or `2`)
 - `lecture-dynamic` (or `3`)
 - `lecture-book` (or `4`)
-- `classic-book` (or `5`)
+- `6x9book` (or `5`; legacy name `classic-book` also works)
+- `a5book` (or `6`; A6 finished pages on folded A5 sheets)
 
 You can use `--template <name>` with both `notes init-course` and `notes init-topic`.
 Each template maps to its own preamble file:
@@ -165,9 +184,10 @@ Each template maps to its own preamble file:
 - `lecture-light` -> `templates/preambles/template2.tex`
 - `lecture-dynamic` -> `templates/preambles/template3.tex`
 - `lecture-book` -> `templates/preambles/template4.tex`
-- `classic-book` -> `templates/preambles/template5.tex`
+- `6x9book` -> `templates/preambles/template5.tex`
+- `a5book` -> `templates/preambles/a5book.tex` plus the shared classic-book rules
 
-Classic-book optional parts:
+Classic book optional parts:
 
 - `notes new-book-part series`
 - `notes new-book-part copyright`

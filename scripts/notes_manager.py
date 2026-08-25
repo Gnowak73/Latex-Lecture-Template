@@ -38,7 +38,8 @@ TEMPLATE_PREAMBLES = {
     "lecture-light": PREAMBLES_DIR / "template2.tex",
     "lecture-dynamic": PREAMBLES_DIR / "template3.tex",
     "lecture-book": PREAMBLES_DIR / "template4.tex",
-    "classic-book": PREAMBLES_DIR / "template5.tex",
+    "6x9book": PREAMBLES_DIR / "template5.tex",
+    "a5book": PREAMBLES_DIR / "a5book.tex",
 }
 
 TEMPLATE_ALIASES = {
@@ -46,13 +47,20 @@ TEMPLATE_ALIASES = {
     "2": "lecture-light",
     "3": "lecture-dynamic",
     "4": "lecture-book",
-    "5": "classic-book",
+    "5": "6x9book",
+    "6": "a5book",
     "template1": "lecture-color",
     "template2": "lecture-light",
     "template3": "lecture-dynamic",
     "template4": "lecture-book",
-    "template5": "classic-book",
+    "template5": "6x9book",
+    "template6": "a5book",
+    "classic-book": "6x9book",
+    "6x9-book": "6x9book",
+    "a5-book": "a5book",
 }
+
+CLASSIC_BOOK_TEMPLATES = {"6x9book", "a5book"}
 
 LETTER_PRINT_TEMPLATE = r"""\documentclass[letterpaper]{article}
 \usepackage[margin=0in]{geometry}
@@ -85,6 +93,21 @@ LETTER_PRINT_TEMPLATE = r"""\documentclass[letterpaper]{article}
   pages=-,
   noautoscale=true,
   pagecommand={\booktrimmarks}
+]{master.pdf}
+\end{document}
+"""
+
+A5_BOOKLET_PRINT_TEMPLATE = r"""\documentclass[a5paper,landscape]{article}
+\usepackage[margin=0pt]{geometry}
+\usepackage{pdfpages}
+\pagestyle{empty}
+
+\begin{document}
+\includepdf[
+  pages=-,
+  booklet,
+  nup=2x1,
+  noautoscale=true
 ]{master.pdf}
 \end{document}
 """
@@ -148,6 +171,27 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openrigh
 % Generated title leaves use the text-area anchors provided by this package.
 % Keep this here as well as in template5 so older project preambles still work.
 \\usepackage{{tikzpagenodes}}
+% Defaults preserve compatibility with preambles created before the page-size
+% variants were introduced. Current 6x9book and a5book preambles override them.
+\\providecommand{{\\bookhalftitley}}{{1.36in}}
+\\providecommand{{\\bookhalftitlewidth}}{{\\textwidth}}
+\\providecommand{{\\bookserieslineone}}{{1.44in}}
+\\providecommand{{\\bookserieslinetwo}}{{1.64in}}
+\\providecommand{{\\booktitley}}{{0.68in}}
+\\providecommand{{\\booktitlewidth}}{{\\textwidth}}
+\\providecommand{{\\booktitlefontsize}}{{34.5}}
+\\providecommand{{\\booktitleleading}}{{38}}
+\\providecommand{{\\booktitletracking}}{{110}}
+\\providecommand{{\\booktitleruley}}{{1.32in}}
+\\providecommand{{\\booktitlerulehalfwidth}}{{2.03in}}
+\\providecommand{{\\booktitlebyy}}{{1.78in}}
+\\providecommand{{\\booktitleauthory}}{{2.04in}}
+\\providecommand{{\\booktitleaffiliationy}}{{2.32in}}
+\\providecommand{{\\booktitleeditiony}}{{4.29in}}
+\\providecommand{{\\booktitlemarky}}{{5.64in}}
+\\providecommand{{\\booktitlepublishery}}{{6.50in}}
+\\providecommand{{\\booktitlelocationsy}}{{6.75in}}
+\\providecommand{{\\booktitlepublisherwidth}}{{5.20in}}
 \\input{{symbols.tex}}
 \\title{{{title}}}
 \\author{{{author}}}
@@ -172,9 +216,9 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openrigh
     \\hypersetup{{pageanchor=false}}
     \\thispagestyle{{empty}}
     \\begin{{tikzpicture}}[remember picture,overlay]
-        \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]
-            at ([yshift=-1.36in]current page text area.north)
-            {{\\fontsize{{34.5}}{{38}}\\selectfont
+        \\node[anchor=north,inner sep=0pt,text width=\\bookhalftitlewidth,align=center]
+            at ([yshift=-\\bookhalftitley]current page text area.north)
+            {{\\fontsize{{\\booktitlefontsize}}{{\\booktitleleading}}\\selectfont
               \\textls[110]{{\\MakeUppercase{{{title}}}}}}};
     \\end{{tikzpicture}}
     \\null
@@ -183,32 +227,32 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openrigh
 {seriespage}
     \\thispagestyle{{empty}}
     \\begin{{tikzpicture}}[remember picture,overlay]
-            \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]
-                at ([yshift=-0.68in]current page text area.north)
-                {{\\fontsize{{34.5}}{{38}}\\selectfont
-                  \\textls[110]{{\\MakeUppercase{{{title}}}}}}};
+            \\node[anchor=north,inner sep=0pt,text width=\\booktitlewidth,align=center]
+                at ([yshift=-\\booktitley]current page text area.north)
+                {{\\fontsize{{\\booktitlefontsize}}{{\\booktitleleading}}\\selectfont
+                  \\textls[\\booktitletracking]{{\\MakeUppercase{{{title}}}}}}};
             \\draw[line width=0.6pt]
-                ([xshift=-2.03in,yshift=-1.32in]current page text area.north) --
-                ([xshift= 2.03in,yshift=-1.32in]current page text area.north);
+                ([xshift=-\\booktitlerulehalfwidth,yshift=-\\booktitleruley]current page text area.north) --
+                ([xshift= \\booktitlerulehalfwidth,yshift=-\\booktitleruley]current page text area.north);
             \\node[anchor=north,inner sep=0pt]
-                at ([yshift=-1.78in]current page text area.north)
+                at ([yshift=-\\booktitlebyy]current page text area.north)
                 {{\\fontsize{{9.5}}{{11}}\\selectfont\\itshape by}};
             \\node[anchor=north,inner sep=0pt]
-                at ([yshift=-2.04in]current page text area.north)
+                at ([yshift=-\\booktitleauthory]current page text area.north)
                 {{\\fontsize{{10.7}}{{12.8}}\\selectfont\\normalfont\\textls[140]{{\\MakeUppercase{{{author}}}}}}};
             \\ifstrempty{{\\bookaffiliation}}{{}}{{
                 \\node[anchor=north,inner sep=0pt]
-                    at ([yshift=-2.32in]current page text area.north)
+                    at ([yshift=-\\booktitleaffiliationy]current page text area.north)
                     {{\\fontsize{{9.6}}{{11.5}}\\selectfont\\itshape\\bookaffiliation}};
             }}
             \\ifstrempty{{\\bookedition}}{{}}{{
                 \\node[anchor=north,inner sep=0pt]
-                    at ([yshift=-4.29in]current page text area.north)
+                    at ([yshift=-\\booktitleeditiony]current page text area.north)
                     {{\\fontsize{{7.5}}{{9.5}}\\selectfont\\normalfont\\MakeUppercase{{\\bookedition}}}};
             }}
             \\ifdefstring{{\\bookpublishermark}}{{none}}{{}}{{
                 \\begin{{scope}}[
-                    shift={{([yshift=-5.64in]current page text area.north)}}
+                    shift={{([yshift=-\\booktitlemarky]current page text area.north)}}
                 ]
                     % Original press mark: a guiding star over an open folio.
                     \\fill (0,7pt) -- (2pt,2pt) -- (7pt,0) --
@@ -221,14 +265,14 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openrigh
                 \\end{{scope}}
             }}
             \\ifstrempty{{\\bookpublisher}}{{}}{{
-                \\node[anchor=north,inner sep=0pt,text width=5.20in,align=center]
-                    at ([yshift=-6.50in]current page text area.north)
+                \\node[anchor=north,inner sep=0pt,text width=\\booktitlepublisherwidth,align=center]
+                    at ([yshift=-\\booktitlepublishery]current page text area.north)
                     {{\\fontsize{{10.2}}{{12}}\\selectfont\\normalfont
                       \\textls[85]{{\\MakeUppercase{{\\bookpublisher}}}}}};
             }}
             \\ifstrempty{{\\bookpublisherlocations}}{{}}{{
-                \\node[anchor=north,inner sep=0pt,text width=5.20in,align=center]
-                    at ([yshift=-6.75in]current page text area.north)
+                \\node[anchor=north,inner sep=0pt,text width=\\booktitlepublisherwidth,align=center]
+                    at ([yshift=-\\booktitlelocationsy]current page text area.north)
                     {{\\fontsize{{7.7}}{{11.5}}\\selectfont\\normalfont
                       \\textls[45]{{\\MakeUppercase{{\\bookpublisherlocations}}}}}};
             }}
@@ -255,7 +299,11 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openrigh
 
 
 def is_book_template(template: str) -> bool:
-    return template in {"lecture-book", "classic-book"}
+    return template == "lecture-book" or template in CLASSIC_BOOK_TEMPLATES
+
+
+def is_classic_book_template(template: str) -> bool:
+    return template in CLASSIC_BOOK_TEMPLATES
 
 
 def vendor_classic_book_fonts(path: Path) -> None:
@@ -315,24 +363,24 @@ def rewrite_master_for_current_notebook(path: Path):
 
     master = path / "master.tex"
     if is_book_template(template):
-        # Optional book parts. classic-book follows the Symon-style order:
+        # Classic book variants follow the Symon-style order:
         # title matter, preface, contents, chapters, bibliography, answers, symbols, index.
         front_lines: list[str] = []
         back_lines: list[str] = []
         conclusion_lines: list[str] = []
         seriespage = ""
 
-        if template == "classic-book":
+        if is_classic_book_template(template):
             if series:
                 seriespage = (
                     "\n"
                     "    \\thispagestyle{empty}\n"
                     "    \\begin{tikzpicture}[remember picture,overlay]\n"
                     "        \\node[anchor=north,inner sep=0pt]\n"
-                    "            at ([yshift=-1.44in]current page text area.north)\n"
+                    "            at ([yshift=-\\bookserieslineone]current page text area.north)\n"
                     "            {\\fontsize{10}{12}\\selectfont This book is in the};\n"
                     "        \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]\n"
-                    "            at ([yshift=-1.64in]current page text area.north)\n"
+                    "            at ([yshift=-\\bookserieslinetwo]current page text area.north)\n"
                     f"            {{\\fontsize{{10}}{{12}}\\selectfont\\textls[75]{{\\MakeUppercase{{{series}}}}}}};\n"
                     "    \\end{tikzpicture}\n"
                     "    \\null\n"
@@ -425,7 +473,7 @@ def cmd_fix_master(_args):
             dst = path / fname
             if src.exists():
                 shutil.copy2(src, dst)
-    elif template == "classic-book":
+    elif is_classic_book_template(template):
         vendor_classic_book_fonts(path)
     rewrite_master_for_current_notebook(path)
     print(f"Rewrote master.tex for: {path.name}")
@@ -606,13 +654,16 @@ def normalize_template_name(name: str) -> str:
     if key in TEMPLATE_PREAMBLES:
         return key
     available = ", ".join(sorted(TEMPLATE_PREAMBLES.keys()))
-    raise SystemExit(f"Unknown template '{name}'. Available: {available} (or 1-5)")
+    raise SystemExit(f"Unknown template '{name}'. Available: {available} (or 1-6)")
 
 
 def write_notebook_preamble(path: Path, template_name: str):
-    src = selected_preamble_template(template_name)
+    normalized = normalize_template_name(template_name)
+    src = selected_preamble_template(normalized)
     dst = path / "preamble.tex"
     text = src.read_text(encoding="utf-8")
+    if normalized == "a5book":
+        text += "\n" + (PREAMBLES_DIR / "template5.tex").read_text(encoding="utf-8")
 
     # Compatibility: lecture-notes templates define \lesson, while this tool writes \lecture.
     compat = (
@@ -661,7 +712,7 @@ def init_notebook(
     # Book templates force chapter structure to avoid mixed semantics.
     if is_book_template(template):
         structure = "chapters"
-    if template == "classic-book":
+    if is_classic_book_template(template):
         preface_date = preface_date.strip() or dt.datetime.now().strftime("%B, %Y")
         preface_author = preface_author.strip() or author
     path.mkdir(parents=True, exist_ok=True)
@@ -699,16 +750,16 @@ def init_notebook(
         if is_book_template(template):
             date = dt.datetime.now().strftime("%B %Y")
             initial_seriespage = ""
-            if template == "classic-book" and series:
+            if is_classic_book_template(template) and series:
                 initial_seriespage = (
                     "\n"
                     "    \\thispagestyle{empty}\n"
                     "    \\begin{tikzpicture}[remember picture,overlay]\n"
                     "        \\node[anchor=north,inner sep=0pt]\n"
-                    "            at ([yshift=-1.44in]current page text area.north)\n"
+                    "            at ([yshift=-\\bookserieslineone]current page text area.north)\n"
                     "            {\\fontsize{10}{12}\\selectfont This book is in the};\n"
                     "        \\node[anchor=north,inner sep=0pt,text width=\\textwidth,align=center]\n"
-                    "            at ([yshift=-1.64in]current page text area.north)\n"
+                    "            at ([yshift=-\\bookserieslinetwo]current page text area.north)\n"
                     f"            {{\\fontsize{{10}}{{12}}\\selectfont\\textls[75]{{\\MakeUppercase{{{series}}}}}}};\n"
                     "    \\end{tikzpicture}\n"
                     "    \\null\n"
@@ -774,7 +825,7 @@ def init_notebook(
         bib = path / "bibliography.bib"
         if not bib.exists():
             bib.write_text("% bibliography.bib\n", encoding="utf-8")
-    elif template == "classic-book":
+    elif is_classic_book_template(template):
         vendor_classic_book_fonts(path)
         symbols = path / "symbols.tex"
         if not symbols.exists():
@@ -947,6 +998,46 @@ def cmd_print_letter(args):
     print("Print at Actual Size / 100%; cut on the 6x9 trim box or crop marks.")
 
 
+def cmd_print_a5_booklet(args):
+    path = current_course_path() if args.current else find_notebook(args.course)
+    info = parse_info_yaml(path)
+    template = normalize_template_name(info.get("template", "lecture-color"))
+    if template != "a5book":
+        raise SystemExit(
+            "print-a5-booklet requires an a5book project (A6 finished pages)."
+        )
+
+    master = path / "master.tex"
+    if not master.exists():
+        raise SystemExit(f"Missing {master}")
+
+    master_build = subprocess.run(
+        ["latexmk", "-pdf", "-interaction=nonstopmode", str(master)],
+        cwd=path,
+        check=False,
+    )
+    master_pdf = path / "master.pdf"
+    if master_build.returncode != 0 or not master_pdf.exists():
+        raise SystemExit("Book compilation failed; A5 booklet was not generated.")
+
+    wrapper = path / "print-a5-booklet.tex"
+    wrapper.write_text(A5_BOOKLET_PRINT_TEMPLATE, encoding="utf-8")
+    booklet_build = subprocess.run(
+        ["latexmk", "-pdf", "-interaction=nonstopmode", str(wrapper)],
+        cwd=path,
+        check=False,
+    )
+    booklet_pdf = path / "print-a5-booklet.pdf"
+    if booklet_build.returncode != 0 or not booklet_pdf.exists():
+        raise SystemExit("A5 booklet imposition failed.")
+
+    print(booklet_pdf)
+    print(
+        "Print at Actual Size / 100%, double-sided, flip on the short edge; "
+        "then fold the A5 sheets in half."
+    )
+
+
 def cmd_list_figures(_args):
     path = current_course_path()
     figdir = path / "figures"
@@ -1099,7 +1190,8 @@ def cmd_list_templates(_args):
     print("2  lecture-light")
     print("3  lecture-dynamic")
     print("4  lecture-book")
-    print("5  classic-book")
+    print("5  6x9book")
+    print("6  a5book (A6 pages folded from A5 sheets)")
 
 
 def build_parser():
@@ -1112,8 +1204,8 @@ def build_parser():
     a.add_argument("--short", required=True)
     a.add_argument("--url", default="https://")
     a.add_argument("--author", default="Gabriel Nowaskie")
-    a.add_argument("--series", default="", help="Optional classic-book series name")
-    a.add_argument("--publisher", default="", help="Optional classic-book publisher/imprint line")
+    a.add_argument("--series", default="", help="Optional classic book series name")
+    a.add_argument("--publisher", default="", help="Optional classic book publisher/imprint line")
     a.add_argument("--affiliation", default="", help="Optional institution shown below the author")
     a.add_argument("--edition", default="", help="Optional edition line, for example 'Second Edition'")
     a.add_argument("--printing", default="", help="Optional printing line, for example 'Third Printing'")
@@ -1127,12 +1219,12 @@ def build_parser():
     a.add_argument("--printed-line", default="", help="Optional copyright-page printing/location line")
     a.add_argument("--copyright-notice", default="", help="Optional rights notice; use | for explicit line breaks")
     a.add_argument("--catalog-label", default="", help="Optional label preceding the catalog number")
-    a.add_argument("--running-heads", choices=["symon", "math"], default="symon", help="Classic-book running heads: Symon chapter/section or Apostol theorem tracking")
+    a.add_argument("--running-heads", choices=["symon", "math"], default="symon", help="Classic book running heads: Symon chapter/section or Apostol theorem tracking")
     a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
     a.add_argument(
         "--template",
         default="lecture-color",
-        help="Notebook template style (lecture-color|lecture-light|lecture-dynamic|lecture-book|classic-book or 1-5)",
+        help="Notebook template style (lecture-color|lecture-light|lecture-dynamic|lecture-book|6x9book|a5book or 1-6)",
     )
     a.set_defaults(func=cmd_init_course)
 
@@ -1145,8 +1237,8 @@ def build_parser():
     a.add_argument("--short", required=True)
     a.add_argument("--url", default="https://")
     a.add_argument("--author", default="Gabriel Nowaskie")
-    a.add_argument("--series", default="", help="Optional classic-book series name")
-    a.add_argument("--publisher", default="", help="Optional classic-book publisher/imprint line")
+    a.add_argument("--series", default="", help="Optional classic book series name")
+    a.add_argument("--publisher", default="", help="Optional classic book publisher/imprint line")
     a.add_argument("--affiliation", default="", help="Optional institution shown below the author")
     a.add_argument("--edition", default="", help="Optional edition line, for example 'Second Edition'")
     a.add_argument("--printing", default="", help="Optional printing line, for example 'Third Printing'")
@@ -1160,12 +1252,12 @@ def build_parser():
     a.add_argument("--printed-line", default="", help="Optional copyright-page printing/location line")
     a.add_argument("--copyright-notice", default="", help="Optional rights notice; use | for explicit line breaks")
     a.add_argument("--catalog-label", default="", help="Optional label preceding the catalog number")
-    a.add_argument("--running-heads", choices=["symon", "math"], default="symon", help="Classic-book running heads: Symon chapter/section or Apostol theorem tracking")
+    a.add_argument("--running-heads", choices=["symon", "math"], default="symon", help="Classic book running heads: Symon chapter/section or Apostol theorem tracking")
     a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
     a.add_argument(
         "--template",
         default="lecture-color",
-        help="Notebook template style (lecture-color|lecture-light|lecture-dynamic|lecture-book|classic-book or 1-5)",
+        help="Notebook template style (lecture-color|lecture-light|lecture-dynamic|lecture-book|6x9book|a5book or 1-6)",
     )
     a.set_defaults(func=cmd_init_topic)
 
@@ -1214,6 +1306,15 @@ def build_parser():
     g.add_argument("--current", action="store_true")
     g.add_argument("--course")
     a.set_defaults(func=cmd_print_letter)
+
+    a = sub.add_parser(
+        "print-a5-booklet",
+        help="Impose an a5book project two-up as a folded A5 booklet",
+    )
+    g = a.add_mutually_exclusive_group(required=True)
+    g.add_argument("--current", action="store_true")
+    g.add_argument("--course")
+    a.set_defaults(func=cmd_print_a5_booklet)
 
     a = sub.add_parser("list-figures", help="List figure names in current course")
     a.set_defaults(func=cmd_list_figures)

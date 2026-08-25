@@ -19,7 +19,7 @@
   \emergencystretch=0pt\relax}
 \AddToHook{cmd/mainmatter/after}{\symonmaintextfont}
 \AddToHook{cmd/backmatter/after}{\symonrestorebookfont}
-% New classic-book projects vendor the optically lighter Symon Schoolbook
+% New classic book projects vendor the optically lighter Symon Schoolbook
 % outlines while retaining Schola's mature TeX metrics and math companion.
 \ifdefined\pdfmapline
   \IfFileExists{fonts/symon-schoolbook-map.tex}{%
@@ -33,16 +33,47 @@
 }
 \spaceskip=0.47em plus 0.16em minus 0.04em\relax
 
+% Page and title-leaf dimensions are overridable by the A5-folded variant.
+\providecommand{\classicpaperwidth}{6in}
+\providecommand{\classicpaperheight}{9in}
+\providecommand{\classicinnermargin}{15mm}
+\providecommand{\classicoutermargin}{20mm}
+\providecommand{\classictopmargin}{0.86in}
+\providecommand{\classicbottommargin}{0.72in}
+\providecommand{\classicheadheight}{12pt}
+\providecommand{\classicheadsep}{0.16in}
+\providecommand{\classicfootskip}{0.32in}
+
+\providecommand{\bookhalftitley}{1.36in}
+\providecommand{\bookhalftitlewidth}{\textwidth}
+\providecommand{\bookserieslineone}{1.44in}
+\providecommand{\bookserieslinetwo}{1.64in}
+\providecommand{\booktitley}{0.68in}
+\providecommand{\booktitlewidth}{\textwidth}
+\providecommand{\booktitlefontsize}{34.5}
+\providecommand{\booktitleleading}{38}
+\providecommand{\booktitletracking}{110}
+\providecommand{\booktitleruley}{1.32in}
+\providecommand{\booktitlerulehalfwidth}{2.03in}
+\providecommand{\booktitlebyy}{1.78in}
+\providecommand{\booktitleauthory}{2.04in}
+\providecommand{\booktitleaffiliationy}{2.32in}
+\providecommand{\booktitleeditiony}{4.29in}
+\providecommand{\booktitlemarky}{5.64in}
+\providecommand{\booktitlepublishery}{6.50in}
+\providecommand{\booktitlelocationsy}{6.75in}
+\providecommand{\booktitlepublisherwidth}{5.20in}
+
 \usepackage[
-    paperwidth=6in,
-    paperheight=9in,
-    inner=15mm,
-    outer=20mm,
-    top=0.86in,
-    bottom=0.72in,
-    headheight=12pt,
-    headsep=0.16in,
-    footskip=0.32in
+    paperwidth=\classicpaperwidth,
+    paperheight=\classicpaperheight,
+    inner=\classicinnermargin,
+    outer=\classicoutermargin,
+    top=\classictopmargin,
+    bottom=\classicbottommargin,
+    headheight=\classicheadheight,
+    headsep=\classicheadsep,
+    footskip=\classicfootskip
 ]{geometry}
 
 \usepackage[
