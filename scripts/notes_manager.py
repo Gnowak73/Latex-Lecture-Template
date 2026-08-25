@@ -165,7 +165,7 @@ MASTER_TEMPLATE_BOOK_CHAPTERS = """\\documentclass[working]{{tuftebook}}
 \\end{{document}}
 """
 
-MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openright]{{book}}
+MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openany]{{book}}
 
 \\input{{preamble.tex}}
 % Generated title leaves use the text-area anchors provided by this package.
@@ -287,8 +287,7 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openrigh
     \\pagestyle{{symonmain}}
     % start chapters
     % end chapters
-    \\backmatter
-    \\pagestyle{{symonback}}
+{backmatter_setup}
 {conclusion}
 {bibliography}
 {backmatter}
@@ -426,6 +425,12 @@ def rewrite_master_for_current_notebook(path: Path):
         frontmatter = ("\n" + "\n".join(front_lines) + "\n") if front_lines else ""
         conclusion = ("\n" + "\n".join(conclusion_lines) + "\n") if conclusion_lines else ""
         backmatter = ("\n" + "\n".join(back_lines) + "\n") if back_lines else ""
+        bibliography = classic_bibliography_block(path)
+        backmatter_setup = (
+            "    \\backmatter\n    \\pagestyle{symonback}\n"
+            if conclusion or bibliography or backmatter
+            else ""
+        )
 
         date = dt.datetime.now().strftime("%B %Y")
         publisherline = (
@@ -462,7 +467,8 @@ def rewrite_master_for_current_notebook(path: Path):
                 publisherline=publisherline,
                 frontmatter=frontmatter,
                 conclusion=conclusion,
-                bibliography=classic_bibliography_block(path),
+                bibliography=bibliography,
+                backmatter_setup=backmatter_setup,
                 backmatter=backmatter,
             ),
             encoding="utf-8",
@@ -786,6 +792,12 @@ def init_notebook(
                 if template == "lecture-book"
                 else MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS
             )
+            bibliography = classic_bibliography_block(path)
+            backmatter_setup = (
+                "    \\backmatter\n    \\pagestyle{symonback}\n"
+                if bibliography
+                else ""
+            )
             master.write_text(
                 master_template.format(
                     title=title,
@@ -816,7 +828,8 @@ def init_notebook(
                     ),
                     frontmatter="",
                     conclusion="",
-                    bibliography=classic_bibliography_block(path),
+                    bibliography=bibliography,
+                    backmatter_setup=backmatter_setup,
                     backmatter="",
                 ),
                 encoding="utf-8",

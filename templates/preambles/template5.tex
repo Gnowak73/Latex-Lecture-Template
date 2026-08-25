@@ -43,6 +43,8 @@
 \providecommand{\classicheadheight}{12pt}
 \providecommand{\classicheadsep}{0.16in}
 \providecommand{\classicfootskip}{0.32in}
+\providecommand{\classicplainpageraise}{0.41in}
+\providecommand{\classicfoliofont}{\symonschoolbookfont\fontsize{10}{12}\selectfont}
 
 \providecommand{\bookhalftitley}{1.36in}
 \providecommand{\bookhalftitlewidth}{\textwidth}
@@ -245,7 +247,7 @@
 
 \fancypagestyle{symonmain}{%
   \fancyhf{}%
-  \fancyhead[LE]{{\symonschoolbookfont\thepage}}%
+  \fancyhead[LE]{{\classicfoliofont\thepage}}%
   \fancyhead[CE]{{\symonschoolbookfont\fontsize{7.4}{8.5}\selectfont\MakeUppercase{\leftmark}}}%
   \fancyhead[RE]{%
     \ifdefstring{\symonrunningheadmode}{math}
@@ -261,7 +263,7 @@
     \ifdefstring{\symonrunningheadmode}{math}
       {\MakeUppercase{\leftmark}}
       {\MakeUppercase{\rightmark}}}%
-  \fancyhead[RO]{{\symonschoolbookfont\thepage}}%
+  \fancyhead[RO]{{\classicfoliofont\thepage}}%
   \renewcommand{\headrulewidth}{0pt}%
   \renewcommand{\footrulewidth}{0pt}%
 }
@@ -288,7 +290,7 @@
 
 \fancypagestyle{plain}{%
   \fancyhf{}%
-  \fancyfoot[C]{\raisebox{0.41in}[0pt][0pt]{{\symonschoolbookfont\thepage}}}%
+  \fancyfoot[C]{\raisebox{\classicplainpageraise}[0pt][0pt]{{\classicfoliofont\thepage}}}%
   \renewcommand{\headrulewidth}{0pt}%
   \renewcommand{\footrulewidth}{0pt}%
 }
