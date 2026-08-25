@@ -15,7 +15,6 @@
     \input{fonts/symon-schoolbook-map.tex}%
   }{}
 \fi
-
 % The metal-set reference has slightly more air between words than digital
 % defaults. Preserve proportional glue at every selected font size.
 \AddToHook{selectfont}{%
@@ -46,7 +45,7 @@
 \usepackage[dvipsnames,svgnames]{xcolor}
 % Symon's display bold is both narrower and slightly shorter than the regular
 % CHAPTER line despite sharing its nominal point size.
-\newcommand{\symonbold}[1]{\scalebox{0.834}[0.92]{\bfseries #1}}
+\newcommand{\symonbold}[1]{\scalebox{0.952}[0.92]{\bfseries #1}}
 \usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb}
 \usepackage{mathrsfs}
 \usepackage{cancel}
@@ -146,6 +145,11 @@
   [.]
 \titlespacing*{\subsection}{0pt}{0.8em plus 0.2em minus 0.1em}{0.5em}
 
+% The project generator always vendors this metric and its mapped Type 1 face.
+\DeclareFontFamily{T1}{symontoc}{}
+\DeclareFontShape{T1}{symontoc}{m}{n}{<-> s*[0.93] symontoc}{}
+\newcommand{\symontocfont}{\fontfamily{symontoc}\fontseries{m}\fontshape{n}\selectfont}
+
 \titlecontents{chapter}
   [0.45em]
   {\vspace{1.60em}\scshape\spaceskip=0.53em\relax}
@@ -155,7 +159,7 @@
   [\vspace{0.15em}]
 \titlecontents{section}
   [4.4em]
-  {\normalfont\spaceskip=0pt}
+  {\symontocfont\spaceskip=0pt}
   {\contentslabel{2.7em}}
   {}
   {\titlerule*[1.0pc]{.}\contentspage}

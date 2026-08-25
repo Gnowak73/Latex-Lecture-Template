@@ -232,6 +232,8 @@ def vendor_classic_book_fonts(path: Path) -> None:
     for source in CLASSIC_FONT_DIR.iterdir():
         if source.is_file():
             shutil.copy2(source, destination / source.name)
+            if source.name == "symontoc.tfm":
+                shutil.copy2(source, path / source.name)
 
 
 def symbols_define_list(path: Path) -> bool:

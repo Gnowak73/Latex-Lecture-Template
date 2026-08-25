@@ -3,8 +3,9 @@ Source family: TeX Gyre Schola 2.005
 License: GUST Font License 1.0 / LPPL 1.3c or later
 
 This renamed derivative preserves the source family's metrics. Regular and
-italic outlines are lightened by 8 em units; bold and bold italic outlines
-are lightened by 12 em units. See scripts/build_symon_schoolbook.py.
+italic outlines are lightened by 12 em units; bold and bold italic outlines
+are lightened by 18 em units. The TOC Light cut uses the regular metrics with
+an 18-unit reduction. See scripts/build_symon_schoolbook.py.
 
 Generated font files:
   symon-schoolbook-regular.pfb
@@ -15,3 +16,6 @@ Generated font files:
   symon-schoolbook-bold.otf
   symon-schoolbook-bolditalic.pfb
   symon-schoolbook-bolditalic.otf
+  symon-schoolbook-toc.pfb
+  symon-schoolbook-toc.otf
+  symontoc.tfm

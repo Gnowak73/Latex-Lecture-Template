@@ -6,6 +6,7 @@ Run with:
 """
 
 from pathlib import Path
+import shutil
 import subprocess
 
 import fontforge
@@ -20,6 +21,7 @@ FACES = (
     ("qcsri.pfb", "Italic", "Italic", -12),
     ("qcsb.pfb", "Bold", "Bold", -18),
     ("qcsbi.pfb", "BoldItalic", "Bold Italic", -18),
+    ("qcsr.pfb", "TOC", "TOC Light", -18),
 )
 
 
@@ -76,6 +78,7 @@ def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     for face in FACES:
         build_face(*face)
+    shutil.copy2(kpsewhich("ec-qcsr.tfm"), OUTPUT_DIR / "symontoc.tfm")
 
 
 if __name__ == "__main__":
