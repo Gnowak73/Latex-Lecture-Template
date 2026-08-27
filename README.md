@@ -105,12 +105,14 @@ notes init-course analysis \
   --catalog-card "60-5164" \
   --publisher-mark folio-star \
   --printed-line "Printed in the United States of America" \
-  --copyright-notice "All rights reserved. This book, or parts thereof, may not be reproduced without permission." \
+  --copyright-notice "All rights reserved. This book, or parts there-|of, may not be reproduced in any form with-|out written permission of the publisher." \
   --catalog-label "Library of Congress Catalog Card No." \
   --running-heads math
 ```
 
-All title and copyright fields are optional. The same settings can be changed
+All title and copyright fields are optional. New books use the printed-in-USA
+line and rights notice shown above by default; pass an empty `--printed-line`
+or `--copyright-notice` to omit either one. The same settings can be changed
 later in `info.yaml`, including `running_heads: 'symon'` or
 `running_heads: 'math'`, followed by `notes fix-master`.
 

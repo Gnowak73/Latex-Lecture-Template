@@ -62,6 +62,12 @@ TEMPLATE_ALIASES = {
 
 CLASSIC_BOOK_TEMPLATES = {"6x9book", "a5book"}
 
+DEFAULT_PRINTED_LINE = "Printed in the United States of America"
+DEFAULT_COPYRIGHT_NOTICE = (
+    "All rights reserved. This book, or parts there-|of, may not be reproduced "
+    "in any form with-|out written permission of the publisher."
+)
+
 LETTER_PRINT_TEMPLATE = r"""\documentclass[letterpaper]{article}
 \usepackage[margin=0in]{geometry}
 \usepackage{pdfpages}
@@ -180,13 +186,20 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openany]
 \\providecommand{{\\booktitley}}{{0.68in}}
 \\providecommand{{\\booktitlewidth}}{{\\textwidth}}
 \\providecommand{{\\booktitlefontsize}}{{34.5}}
-\\providecommand{{\\booktitleleading}}{{38}}
+\\providecommand{{\\booktitleleading}}{{43}}
+% Separate fallback lets regenerated masters fix older vendored preambles while
+% preserving the smaller leading selected by the A5 variant.
+\\providecommand{{\\booktitleflowleading}}{{{title_leading}}}
 \\providecommand{{\\booktitletracking}}{{110}}
 \\providecommand{{\\booktitleruley}}{{1.32in}}
 \\providecommand{{\\booktitlerulehalfwidth}}{{2.03in}}
 \\providecommand{{\\booktitlebyy}}{{1.78in}}
 \\providecommand{{\\booktitleauthory}}{{2.04in}}
 \\providecommand{{\\booktitleaffiliationy}}{{2.32in}}
+\\providecommand{{\\booktitlerulegap}}{{0.18in}}
+\\providecommand{{\\booktitlebygap}}{{0.46in}}
+\\providecommand{{\\booktitleauthorgap}}{{0.26in}}
+\\providecommand{{\\booktitleaffiliationgap}}{{0.28in}}
 \\providecommand{{\\booktitleeditiony}}{{4.29in}}
 \\providecommand{{\\booktitlemarky}}{{5.64in}}
 \\providecommand{{\\booktitlepublishery}}{{6.50in}}
@@ -216,10 +229,10 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openany]
     \\hypersetup{{pageanchor=false}}
     \\thispagestyle{{empty}}
     \\begin{{tikzpicture}}[remember picture,overlay]
-        \\node[anchor=north,inner sep=0pt,text width=\\bookhalftitlewidth,align=center]
+        \\node[anchor=north,inner sep=0pt,text width=\\bookhalftitlewidth,align=center,
+              font={{\\fontsize{{\\booktitlefontsize}}{{\\booktitleflowleading}}\\selectfont}}]
             at ([yshift=-\\bookhalftitley]current page text area.north)
-            {{\\fontsize{{\\booktitlefontsize}}{{\\booktitleleading}}\\selectfont
-              \\textls[110]{{\\MakeUppercase{{{title}}}}}}};
+            {{\\textls[110]{{\\MakeUppercase{{{title}}}}}}};
     \\end{{tikzpicture}}
     \\null
     \\clearpage
@@ -227,22 +240,24 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openany]
 {seriespage}
     \\thispagestyle{{empty}}
     \\begin{{tikzpicture}}[remember picture,overlay]
-            \\node[anchor=north,inner sep=0pt,text width=\\booktitlewidth,align=center]
+            \\node (book-title)[anchor=north,inner sep=0pt,text width=\\booktitlewidth,align=center,
+                  font={{\\fontsize{{\\booktitlefontsize}}{{\\booktitleflowleading}}\\selectfont}}]
                 at ([yshift=-\\booktitley]current page text area.north)
-                {{\\fontsize{{\\booktitlefontsize}}{{\\booktitleleading}}\\selectfont
-                  \\textls[\\booktitletracking]{{\\MakeUppercase{{{title}}}}}}};
+                {{\\textls[\\booktitletracking]{{\\MakeUppercase{{{title}}}}}}};
+            \\coordinate (book-title-rule) at
+                ([yshift=-\\booktitlerulegap]book-title.south);
             \\draw[line width=0.6pt]
-                ([xshift=-\\booktitlerulehalfwidth,yshift=-\\booktitleruley]current page text area.north) --
-                ([xshift= \\booktitlerulehalfwidth,yshift=-\\booktitleruley]current page text area.north);
-            \\node[anchor=north,inner sep=0pt]
-                at ([yshift=-\\booktitlebyy]current page text area.north)
+                ([xshift=-\\booktitlerulehalfwidth]book-title-rule) --
+                ([xshift= \\booktitlerulehalfwidth]book-title-rule);
+            \\node (book-title-by)[anchor=north,inner sep=0pt]
+                at ([yshift=-\\booktitlebygap]book-title-rule)
                 {{\\fontsize{{9.5}}{{11}}\\selectfont\\itshape by}};
-            \\node[anchor=north,inner sep=0pt]
-                at ([yshift=-\\booktitleauthory]current page text area.north)
+            \\node (book-title-author)[anchor=north,inner sep=0pt]
+                at ([yshift=-\\booktitleauthorgap]book-title-by.north)
                 {{\\fontsize{{10.7}}{{12.8}}\\selectfont\\normalfont\\textls[140]{{\\MakeUppercase{{{author}}}}}}};
             \\ifstrempty{{\\bookaffiliation}}{{}}{{
                 \\node[anchor=north,inner sep=0pt]
-                    at ([yshift=-\\booktitleaffiliationy]current page text area.north)
+                    at ([yshift=-\\booktitleaffiliationgap]book-title-author.north)
                     {{\\fontsize{{9.6}}{{11.5}}\\selectfont\\itshape\\bookaffiliation}};
             }}
             \\ifstrempty{{\\bookedition}}{{}}{{
@@ -365,8 +380,10 @@ def rewrite_master_for_current_notebook(path: Path):
         publisher_mark = "folio-star"
     if publisher_mark not in {"none", "folio-star"}:
         publisher_mark = "none"
-    printed_line = info.get("printed_line", "").strip()
-    copyright_notice = info.get("copyright_notice", "").strip().replace("|", "\\\\")
+    printed_line = info.get("printed_line", DEFAULT_PRINTED_LINE).strip()
+    copyright_notice = info.get(
+        "copyright_notice", DEFAULT_COPYRIGHT_NOTICE
+    ).strip().replace("|", "\\\\")
     catalog_label = info.get("catalog_label", "").strip()
     running_heads = info.get("running_heads", "symon").strip().lower()
     if running_heads not in {"symon", "math"}:
@@ -462,6 +479,7 @@ def rewrite_master_for_current_notebook(path: Path):
                 copyright_notice=copyright_notice,
                 catalog_label=catalog_label,
                 date=date,
+                title_leading="28" if template == "a5book" else "43",
                 running_heads=running_heads,
                 seriespage=seriespage,
                 publisherline=publisherline,
@@ -719,8 +737,8 @@ def init_notebook(
     copyright_years: str = "",
     catalog_card: str = "",
     publisher_mark: str = "none",
-    printed_line: str = "",
-    copyright_notice: str = "",
+    printed_line: str = DEFAULT_PRINTED_LINE,
+    copyright_notice: str = DEFAULT_COPYRIGHT_NOTICE,
     catalog_label: str = "",
 ):
     template = normalize_template_name(template)
@@ -819,6 +837,7 @@ def init_notebook(
                     copyright_notice=copyright_notice.replace("|", "\\\\"),
                     catalog_label=catalog_label,
                     date=date,
+                    title_leading="28" if template == "a5book" else "43",
                     running_heads=running_heads,
                     seriespage=initial_seriespage,
                     publisherline=(
@@ -1246,8 +1265,16 @@ def build_parser():
     a.add_argument("--copyright-years", default="", help="Copyright year or years; defaults to the current year")
     a.add_argument("--catalog-card", default="", help="Optional Library of Congress catalog card number")
     a.add_argument("--publisher-mark", choices=["none", "folio-star"], default="none", help="Optional original star-and-folio publisher mark")
-    a.add_argument("--printed-line", default="", help="Optional copyright-page printing/location line")
-    a.add_argument("--copyright-notice", default="", help="Optional rights notice; use | for explicit line breaks")
+    a.add_argument(
+        "--printed-line",
+        default=DEFAULT_PRINTED_LINE,
+        help="Copyright-page printing/location line",
+    )
+    a.add_argument(
+        "--copyright-notice",
+        default=DEFAULT_COPYRIGHT_NOTICE,
+        help="Rights notice; use | for explicit line breaks",
+    )
     a.add_argument("--catalog-label", default="", help="Optional label preceding the catalog number")
     a.add_argument("--running-heads", choices=["symon", "math"], default="symon", help="Classic book running heads: Symon chapter/section or Apostol theorem tracking")
     a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
@@ -1279,8 +1306,16 @@ def build_parser():
     a.add_argument("--copyright-years", default="", help="Copyright year or years; defaults to the current year")
     a.add_argument("--catalog-card", default="", help="Optional Library of Congress catalog card number")
     a.add_argument("--publisher-mark", choices=["none", "folio-star"], default="none", help="Optional original star-and-folio publisher mark")
-    a.add_argument("--printed-line", default="", help="Optional copyright-page printing/location line")
-    a.add_argument("--copyright-notice", default="", help="Optional rights notice; use | for explicit line breaks")
+    a.add_argument(
+        "--printed-line",
+        default=DEFAULT_PRINTED_LINE,
+        help="Copyright-page printing/location line",
+    )
+    a.add_argument(
+        "--copyright-notice",
+        default=DEFAULT_COPYRIGHT_NOTICE,
+        help="Rights notice; use | for explicit line breaks",
+    )
     a.add_argument("--catalog-label", default="", help="Optional label preceding the catalog number")
     a.add_argument("--running-heads", choices=["symon", "math"], default="symon", help="Classic book running heads: Symon chapter/section or Apostol theorem tracking")
     a.add_argument("--structure", default="lectures", choices=["lectures", "chapters"], help="Ignored for book templates (always chapters)")
