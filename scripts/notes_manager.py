@@ -255,12 +255,12 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openany]
             \\node (book-title-author)[anchor=north,inner sep=0pt]
                 at ([yshift=-\\booktitleauthorgap]book-title-by.north)
                 {{\\fontsize{{10.7}}{{12.8}}\\selectfont\\normalfont\\textls[140]{{\\MakeUppercase{{{author}}}}}}};
-            \\ifstrempty{{\\bookaffiliation}}{{}}{{
+            \\ifdefempty{{\\bookaffiliation}}{{}}{{
                 \\node[anchor=north,inner sep=0pt]
                     at ([yshift=-\\booktitleaffiliationgap]book-title-author.north)
                     {{\\fontsize{{9.6}}{{11.5}}\\selectfont\\itshape\\bookaffiliation}};
             }}
-            \\ifstrempty{{\\bookedition}}{{}}{{
+            \\ifdefempty{{\\bookedition}}{{}}{{
                 \\node[anchor=north,inner sep=0pt]
                     at ([yshift=-\\booktitleeditiony]current page text area.north)
                     {{\\fontsize{{7.5}}{{9.5}}\\selectfont\\normalfont\\MakeUppercase{{\\bookedition}}}};
@@ -279,13 +279,13 @@ MASTER_TEMPLATE_CLASSIC_BOOK_CHAPTERS = """\\documentclass[10pt,twoside,openany]
                           (16pt,-8pt);
                 \\end{{scope}}
             }}
-            \\ifstrempty{{\\bookpublisher}}{{}}{{
+            \\ifdefempty{{\\bookpublisher}}{{}}{{
                 \\node[anchor=north,inner sep=0pt,text width=\\booktitlepublisherwidth,align=center]
                     at ([yshift=-\\booktitlepublishery]current page text area.north)
                     {{\\fontsize{{10.2}}{{12}}\\selectfont\\normalfont
                       \\textls[85]{{\\MakeUppercase{{\\bookpublisher}}}}}};
             }}
-            \\ifstrempty{{\\bookpublisherlocations}}{{}}{{
+            \\ifdefempty{{\\bookpublisherlocations}}{{}}{{
                 \\node[anchor=north,inner sep=0pt,text width=\\booktitlepublisherwidth,align=center]
                     at ([yshift=-\\booktitlelocationsy]current page text area.north)
                     {{\\fontsize{{7.7}}{{11.5}}\\selectfont\\normalfont

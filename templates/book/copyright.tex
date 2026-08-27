@@ -20,13 +20,13 @@
     ([xshift=-0.60in,yshift=-1.54in]current page text area.north) --
     ([xshift= 0.76in,yshift=-1.54in]current page text area.north);
 
-  \ifstrempty{\bookprintedline}{}{
+  \ifdefempty{\bookprintedline}{}{
     \node[anchor=north,inner sep=0pt]
       at ([xshift=0.08in,yshift=-1.68in]current page text area.north)
       {\fontsize{10}{12}\selectfont\itshape\bookprintedline};
   }
 
-  \ifstrempty{\bookcopyrightnotice}{}{
+  \ifdefempty{\bookcopyrightnotice}{}{
     \node[anchor=north,inner sep=0pt,text width=3.50in,align=center]
       at ([xshift=0.08in,yshift=-1.97in]current page text area.north)
       {\fontsize{7.2}{13}\selectfont\normalfont
@@ -34,25 +34,25 @@
         \MakeUppercase{\bookcopyrightnotice}};
   }
 
-  \ifstrempty{\bookcataloglabel}{}{
+  \ifdefempty{\bookcataloglabel}{}{
     \node[anchor=north,inner sep=0pt]
       at ([xshift=0.08in,yshift=-2.56in]current page text area.north)
       {\fontsize{10}{12}\selectfont\itshape
-        \bookcataloglabel\ \ifstrempty{\bookcatalogcard}
+        \bookcataloglabel\ \ifdefempty{\bookcatalogcard}
           {\rule{0.72in}{0.4pt}}{\bookcatalogcard}};
   }
 
-  \ifstrempty{\bookedition}{}{
+  \ifdefempty{\bookedition}{}{
     \node[anchor=north,inner sep=0pt]
       at ([xshift=0.08in,yshift=-2.91in]current page text area.north)
       {\fontsize{10}{12}\selectfont\normalfont\bookedition};
   }
 
-  \ifstrempty{\bookprinting}{}{
+  \ifdefempty{\bookprinting}{}{
     \node[anchor=north,inner sep=0pt]
       at ([xshift=0.08in,yshift=-3.14in]current page text area.north)
       {\fontsize{10}{12}\selectfont\itshape\bookprinting%
-        \ifstrempty{\bookprintingdate}{}{\textemdash\,\bookprintingdate}};
+        \ifdefempty{\bookprintingdate}{}{\textemdash\,\bookprintingdate}};
   }
 \end{tikzpicture}
 

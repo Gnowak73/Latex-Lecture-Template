@@ -7,13 +7,13 @@
 \providecommand{\bookprefaceauthor}{}
 
 \ifboolexpr{
-  not test {\ifstrempty{\bookprefacedate}}
+  not test {\ifdefempty{\bookprefacedate}}
   or
-  not test {\ifstrempty{\bookprefaceauthor}}
+  not test {\ifdefempty{\bookprefaceauthor}}
 }{%
   \par\vspace{0.65\baselineskip}
   \noindent
-  \ifstrempty{\bookprefacedate}{}{\textit{\bookprefacedate}}%
+  \ifdefempty{\bookprefacedate}{}{\textit{\bookprefacedate}}%
   \hfill
-  \ifstrempty{\bookprefaceauthor}{}{\textsc{\bookprefaceauthor}}%
+  \ifdefempty{\bookprefaceauthor}{}{\textsc{\bookprefaceauthor}}%
 }{}
