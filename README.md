@@ -74,7 +74,7 @@ Print `print-a5-booklet.pdf` at `Actual Size` or `100%`, double-sided, with
 
 Templates: multiple lecture-note templates (based on Gilles Castel’s layouts), `lecture-book` (tufte/masterthesis style), `6x9book` (the 6x9 Addison-Wesley/Symon-style textbook), and `a5book` (the analogous A6 finished page for folding A5 sheets). Book templates always use chapters (`chap_XX.tex` with `\chapter{...}`).
 
-The `6x9book` and `a5book` templates vendor the custom `Symon Schoolbook` Type 1 family into each project. It is an optically lightened, renamed derivative of TeX Gyre Schola with unchanged TeX metrics, so line breaks and the Fourier New Century Schoolbook mathematics remain stable. Rebuild the bundled PFB and OTF files with `fontforge -script scripts/build_symon_schoolbook.py`.
+The `6x9book` and `a5book` templates vendor the custom `Symon Schoolbook` Type 1 family into each project. It is an optically lightened, renamed derivative of TeX Gyre Schola with unchanged TeX metrics, while Latin Modern supplies the main-matter prose and mathematics. Rebuild the bundled PFB and OTF files with `fontforge -script scripts/build_symon_schoolbook.py`.
 
 For both classic book sizes, optional book parts are included in this order when present:
 half-title, series page, title page, copyright, dedication, preface, contents, chapters, bibliography, answers to odd-numbered problems, index of symbols, index.
