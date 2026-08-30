@@ -116,6 +116,7 @@
 \usepackage{fancyhdr}
 \usepackage{extramarks}
 \usepackage{etoolbox}
+\usepackage{multicol}
 \usepackage{makeidx}
 \usepackage{hyperref}
 \hypersetup{
@@ -307,14 +308,23 @@
   \renewcommand{\footrulewidth}{0pt}%
 }
 
-% The index starts a two-column page after the chapter heading.  Reserve the
-% same bottom folio zone after that column switch, so index entries cannot
-% run into the opening-page folio.
+% Use one shared page builder for both index columns.  This lets the ordinary
+% chapter-opening reserve shorten both columns while retaining the raised
+% chapter folio.
 \makeatletter
-\patchcmd{\theindex}
-  {\thispagestyle{plain}\parindent\z@}
-  {\thispagestyle{plain}\enlargethispage{-\classicchapterfolioreserve}\parindent\z@}
-  {}{}
+\renewenvironment{theindex}
+  {\clearpage
+   \@makeschapterhead{\indexname}%
+   \@mkboth{\MakeUppercase\indexname}{\MakeUppercase\indexname}%
+   \thispagestyle{plain}%
+   \setlength{\columnsep}{35\p@}%
+   \begin{multicols}{2}%
+   \parindent\z@
+   \parskip\z@ \@plus .3\p@\relax
+   \columnseprule\z@
+   \raggedcolumns
+   \let\item\@idxitem}
+  {\end{multicols}}
 \makeatother
 
 \newcommand{\symontitleleaf}[1]{%
