@@ -307,6 +307,16 @@
   \renewcommand{\footrulewidth}{0pt}%
 }
 
+% The index starts a two-column page after the chapter heading.  Reserve the
+% same bottom folio zone after that column switch, so index entries cannot
+% run into the opening-page folio.
+\makeatletter
+\patchcmd{\theindex}
+  {\thispagestyle{plain}\parindent\z@}
+  {\thispagestyle{plain}\enlargethispage{-\classicchapterfolioreserve}\parindent\z@}
+  {}{}
+\makeatother
+
 \newcommand{\symontitleleaf}[1]{%
   \clearpage
   \thispagestyle{empty}%
