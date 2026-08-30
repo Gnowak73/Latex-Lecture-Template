@@ -3,4 +3,12 @@
 
 \symontitleleaf{Index}
 \addcontentsline{toc}{chapter}{Index}
+\pagestyle{symonback}
+\markboth{INDEX}{INDEX}
+% book.cls/theindex uses the plain style on its opening page. In the 6x9
+% Symon layout, the plain footer folio can enter the dense two-column index;
+% use the back-matter running head instead, while retaining the Symon heading.
+\makeatletter
+\let\ps@plain\ps@symonback
+\makeatother
 \printindex
