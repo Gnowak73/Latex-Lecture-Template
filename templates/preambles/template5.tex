@@ -232,6 +232,7 @@
       \symonbold{\textls[25]{\MakeUppercase{#1}}}\par\nobreak
     \vskip 1.19em}}
 \renewcommand{\@makeschapterhead}[1]{%
+  \enlargethispage{-\classicchapterfolioreserve}%
   \markboth{\MakeUppercase{#1}}{\MakeUppercase{#1}}%
   \vspace*{0.36in}%
   {\parindent \z@ \centering \normalfont\symonschoolbookfont
