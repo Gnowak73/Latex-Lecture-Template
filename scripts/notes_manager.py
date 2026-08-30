@@ -1024,7 +1024,7 @@ def cmd_print_letter(args):
         raise SystemExit(f"Missing {master}")
 
     master_build = subprocess.run(
-        ["latexmk", "-pdf", "-interaction=nonstopmode", str(master)],
+        ["latexmk", "-g", "-pdf", "-interaction=nonstopmode", str(master)],
         cwd=path,
         check=False,
     )
@@ -1035,7 +1035,7 @@ def cmd_print_letter(args):
     wrapper = path / "print-letter.tex"
     wrapper.write_text(LETTER_PRINT_TEMPLATE, encoding="utf-8")
     proof_build = subprocess.run(
-        ["latexmk", "-pdf", "-interaction=nonstopmode", str(wrapper)],
+        ["latexmk", "-g", "-pdf", "-interaction=nonstopmode", str(wrapper)],
         cwd=path,
         check=False,
     )
