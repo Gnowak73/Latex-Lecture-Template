@@ -45,7 +45,7 @@
 % Symon's chapter-opening folio sits high in the bottom margin.  Shorten only
 % those pages so body text cannot enter the folio's reserved composition zone.
 \providecommand{\classicchapterfolioreserve}{0.32in}
-\providecommand{\classicfoliofont}{\symonschoolbookfont\fontsize{10}{12}\selectfont}
+\providecommand{\classicfoliofont}{\symonschoolbookfont\fontsize{10.2}{10.8}\selectfont}
 \providecommand{\classicchapterfoliofont}{\symonschoolbookfont\fontsize{8.5}{10.2}\selectfont}
 
 \providecommand{\bookhalftitley}{1.36in}
@@ -273,8 +273,9 @@
   \fancyhead[LO]{%
     \ifdefstring{\symonrunningheadmode}{math}
       {{\symonschoolbookfont\fontsize{8.2}{9.2}\selectfont\symonmathrectomark}}
-      {{\symonschoolbookfont\fontsize{8.2}{9.2}\selectfont\thesection]}}}%
+      {{\symonschoolbookfont\fontsize{10.2}{10.8}\selectfont\thesection]}}}%
   \fancyhead[CO]{\symonschoolbookfont\fontsize{7.4}{8.5}\selectfont
+    \spaceskip=0.53em\relax
     \ifdefstring{\symonrunningheadmode}{math}
       {\MakeUppercase{\leftmark}}
       {\MakeUppercase{\rightmark}}}%
