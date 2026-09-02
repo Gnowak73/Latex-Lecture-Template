@@ -100,6 +100,9 @@
 % Symon's display bold is both narrower and slightly shorter than the regular
 % CHAPTER line despite sharing its nominal point size.
 \newcommand{\symonbold}[1]{\scalebox{0.952}[0.92]{\bfseries #1}}
+% Match the height of numerals embedded in all-caps titles.
+\DeclareRobustCommand{\symonheadingnumber}[1]{%
+  \texorpdfstring{\scalebox{1.04}[1.08]{\textls[60]{#1}}}{#1}}
 \usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb}
 \usepackage{mathrsfs}
 \usepackage{cancel}
@@ -263,19 +266,20 @@
 \fancypagestyle{symonmain}{%
   \fancyhf{}%
   \fancyhead[LE]{{\classicfoliofont\thepage}}%
-  \fancyhead[CE]{{\symonschoolbookfont\fontsize{7.4}{8.5}\selectfont\MakeUppercase{\leftmark}}}%
+  \fancyhead[CE]{{\symonschoolbookfont\fontsize{7.8}{8.9}\selectfont
+    \spaceskip=0.70em\relax\MakeUppercase{\leftmark}}}%
   \fancyhead[RE]{%
     \ifdefstring{\symonrunningheadmode}{math}
       {{\symonschoolbookfont\fontsize{8.2}{9.2}\selectfont\symonmathversomark}}
       {{\symonschoolbookfont\fontsize{10.2}{10.8}\selectfont[}%
-       {\symonschoolbookfont\fontsize{7.4}{8.5}\selectfont CHAP.}\ %
+       {\symonschoolbookfont\fontsize{6.8}{7.9}\selectfont CHAP.}\ %
        {\symonschoolbookfont\fontsize{10.2}{10.8}\selectfont\thechapter}}}%
   \fancyhead[LO]{%
     \ifdefstring{\symonrunningheadmode}{math}
       {{\symonschoolbookfont\fontsize{8.2}{9.2}\selectfont\symonmathrectomark}}
       {{\symonschoolbookfont\fontsize{10.2}{10.8}\selectfont\thesection]}}}%
-  \fancyhead[CO]{\symonschoolbookfont\fontsize{7.4}{8.5}\selectfont
-    \spaceskip=0.53em\relax
+  \fancyhead[CO]{\symonschoolbookfont\fontsize{7.8}{8.9}\selectfont
+    \spaceskip=0.70em\relax
     \ifdefstring{\symonrunningheadmode}{math}
       {\MakeUppercase{\leftmark}}
       {\MakeUppercase{\rightmark}}}%
