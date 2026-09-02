@@ -373,12 +373,22 @@
 
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
-\newtheorem*{note}{Note}
 \newtheorem*{notation}{Notation}
 \newtheorem*{problem}{Problem}
 \newtheorem*{observe}{Observe}
 \newtheorem*{property}{Property}
 \newtheorem*{intuition}{Intuition}
+
+% Notes use the Contents chapter-entry face and the same prose separation as
+% a run-in section heading.
+\newtheoremstyle{symonnote}
+  {\topsep}{\topsep}
+  {\normalfont}{}
+  {\normalfont\symonschoolbookfont\scshape\spaceskip=0.53em\relax}
+  {.}{1.035em}
+  {#1}
+\theoremstyle{symonnote}
+\newtheorem*{note}{Note}
 
 \newcommand{\incfig}[2][1]{%
     \def\svgwidth{#1\textwidth}
