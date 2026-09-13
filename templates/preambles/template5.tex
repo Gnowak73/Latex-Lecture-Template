@@ -186,6 +186,16 @@
 \numberwithin{equation}{chapter}
 \renewcommand{\theequation}{\thechapter\symonnumberdash\arabic{equation}}
 
+% Lettered appendices local to one chapter.  Keep this independent of
+% appendix.sty, whose subappendices environment recurses with this template's
+% titlesec and hyperref configuration.
+\newenvironment{subappendices}{%
+  \par
+  \setcounter{section}{0}%
+  \renewcommand{\thesection}{\thechapter\symonnumberdash\Alph{section}}%
+  \renewcommand{\theHsection}{\arabic{chapter}.appendix.\Alph{section}}%
+}{\par}
+
 \titleformat{\chapter}[display]
   {\normalfont\symonschoolbookfont\centering}
   {\MakeUppercase{\chaptername} \thechapter}
