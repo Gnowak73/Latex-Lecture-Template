@@ -401,6 +401,9 @@
 \theoremstyle{symonnote}
 \newtheorem*{note}{Note}
 
+% Match the Note and run-in section heading gap after the proof label.
+\AtBeginEnvironment{proof}{\setlength{\labelsep}{1.035em}}
+
 \newcommand{\incfig}[2][1]{%
     \def\svgwidth{#1\textwidth}
     \import{./figures/}{#2.pdf_tex}
