@@ -382,8 +382,13 @@
 \AtBeginEnvironment{eg}{\symonnextstatementmark{EX.}}
 \AtBeginEnvironment{ex}{\symonnextstatementmark{EXER.}}
 
-\theoremstyle{remark}
+% Preserve the standard remark style, matching the Note and Proof label gap.
+\makeatletter
+\def\th@symonremark{\th@remark\thm@headsep=1.035em\relax}
+\makeatother
+\theoremstyle{symonremark}
 \newtheorem*{remark}{Remark}
+\theoremstyle{remark}
 \newtheorem*{notation}{Notation}
 \newtheorem*{problem}{Problem}
 \newtheorem*{observe}{Observe}
