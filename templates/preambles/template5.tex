@@ -76,6 +76,8 @@
 \providecommand{\booktitlelocationsy}{6.75in}
 \providecommand{\booktitlepublisherwidth}{5.20in}
 
+% Set the body leading before geometry rounds the text height to whole lines.
+\linespread{0.98}\selectfont
 \usepackage[
     paperwidth=\classicpaperwidth,
     paperheight=\classicpaperheight,
@@ -85,7 +87,8 @@
     bottom=\classicbottommargin,
     headheight=\classicheadheight,
     headsep=\classicheadsep,
-    footskip=\classicfootskip
+    footskip=\classicfootskip,
+    heightrounded
 ]{geometry}
 
 \usepackage[
@@ -145,7 +148,6 @@
 
 \setlength{\parindent}{1.2em}
 \setlength{\parskip}{0pt}
-\linespread{0.98}
 \flushbottom
 
 % Blank versos inserted by openright carry no running head or folio.
